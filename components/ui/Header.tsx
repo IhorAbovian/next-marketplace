@@ -14,11 +14,11 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href="/register" className="hover:underline">
+          <Link href="/sign-up" className="hover:underline">
             Register
           </Link>
           <span>or</span>
-          <Link href="/login" className="hover:underline">
+          <Link href="/sign-in" className="hover:underline">
             Sign In
           </Link>
         </div>
