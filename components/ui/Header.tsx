@@ -5,13 +5,10 @@ import SearchBar from "@/components/ui/SearchBar";
 import {
   NavigationMenu,
   NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-  NavigationMenuPositioner,
 } from "./navigation-menu";
 import { usePathname } from "next/navigation";
 
@@ -49,19 +46,19 @@ export default function Header() {
                 <NavigationMenuContent>
                   <div className="flex flex-col gap-2 p-4 w-48">
                     <NavigationMenuLink
-                      href="/cars"
+                      href="/cars/cars-trucks"
                       className="px-4 py-2 hover:bg-gray-100 rounded"
                     >
                       Cars & Trucks
                     </NavigationMenuLink>
                     <NavigationMenuLink
-                      href="/cars"
+                      href="/cars/motorcycles"
                       className="px-4 py-2 hover:bg-gray-100 rounded"
                     >
                       Motorcycles
                     </NavigationMenuLink>
                     <NavigationMenuLink
-                      href="/cars"
+                      href="/cars/boats"
                       className="px-4 py-2 hover:bg-gray-100 rounded"
                     >
                       Boats
@@ -77,13 +74,13 @@ export default function Header() {
                 <NavigationMenuContent>
                   <div className="flex flex-col gap-2 p-4 w-48">
                     <NavigationMenuLink
-                      href="/real-estate"
+                      href="/real-estate/for-sale"
                       className="px-4 py-2 hover:bg-gray-100 rounded"
                     >
                       For Sale
                     </NavigationMenuLink>
                     <NavigationMenuLink
-                      href="/real-estate"
+                      href="/real-estate/for-rent"
                       className="px-4 py-2 hover:bg-gray-100 rounded"
                     >
                       For Rent
