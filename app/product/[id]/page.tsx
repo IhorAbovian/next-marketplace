@@ -1,21 +1,46 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { products } from "@/lib/data";
+import { use } from "react";
 
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const product = products.find(p => p.id === id);
-  
-  if (!product) return <p>Product not found - ID: {id}</p>;
-  
+export default function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const product = products.find((p) => p.id === id);
+
+  if (!product) {
+    return (
+      <div className="container max-w-4xl mx-auto px-4 py-6">
+        <p className="text-red-600 font-semibold">
+          Product not found - ID: {id}
+        </p>
+        <Link
+          href="/"
+          className="text-blue-600 hover:underline mt-4 inline-block"
+        >
+          Back to Home
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="container max-w-4xl mx-auto px-4 py-6">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-4">
-        <Link href="/" className="hover:text-gray-700">Home</Link>
+        <Link href="/" className="hover:text-gray-700">
+          Home
+        </Link>
         <span className="mx-2">›</span>
-        <Link href="/cars" className="hover:text-gray-700">Cars & Trucks</Link>
+        <Link href="/cars" className="hover:text-gray-700">
+          Cars & Trucks
+        </Link>
         <span className="mx-2">›</span>
         <span className="text-gray-800">{product.title}</span>
       </nav>
@@ -23,26 +48,31 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Image Gallery */}
         <div className="lg:col-span-2">
-          <div className="relative aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden mb-4">
-            <Image 
-              src={product.image} 
-              alt={product.title} 
-              fill 
-              className="object-cover" 
-              unoptimized 
+          <div className="bg-gray-100 rounded-lg overflow-hidden mb-4">
+            <Image
+              src={product.image}
+              alt={product.title}
+              width={600}
+              height={400}
+              className="w-full h-auto object-cover rounded-lg"
+              unoptimized
             />
           </div>
-          
+
           {/* Thumbnail gallery */}
           <div className="flex gap-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="relative w-20 h-20 bg-gray-100 rounded cursor-pointer hover:opacity-80">
-                <Image 
-                  src={product.image} 
-                  alt={`${product.title} ${i}`} 
-                  fill 
-                  className="object-cover rounded" 
-                  unoptimized 
+              <div
+                key={i}
+                className="bg-gray-100 rounded cursor-pointer hover:opacity-80 overflow-hidden"
+              >
+                <Image
+                  src={product.image}
+                  alt={`${product.title} ${i}`}
+                  width={80}
+                  height={80}
+                  className="w-20 h-20 object-cover rounded"
+                  unoptimized
                 />
               </div>
             ))}
@@ -52,20 +82,24 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         {/* Product Info */}
         <div className="space-y-4">
           <h1 className="text-2xl font-bold">{product.title}</h1>
-          
+
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-gray-800">${product.price.toLocaleString()}</span>
+            <span className="text-3xl font-bold text-gray-800">
+              ${product.price}
+            </span>
             <span className="text-sm text-gray-500">USD</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span className="bg-gray-100 px-2 py-1 rounded">📍 {product.location}</span>
-            <span className="bg-gray-100 px-2 py-1 rounded">📅 Posted 2 days ago</span>
+            <span className="bg-gray-100 px-2 py-1 rounded">
+              📍 {product.location}
+            </span>
+            <span className="bg-gray-100 px-2 py-1 rounded">
+              📅 Posted 2 days ago
+            </span>
           </div>
 
-          <Button className="w-full py-3 text-base">
-            Contact Seller
-          </Button>
+          <Button className="w-full py-3 text-base">Contact Seller</Button>
 
           <div className="border-t pt-4">
             <h3 className="font-semibold mb-2">Seller Information</h3>
@@ -86,9 +120,10 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Description</h2>
         <p className="text-gray-700 leading-relaxed">
-          Well-maintained vehicle with excellent condition. Clean title, no accidents. 
-          Recent service records available. Serious inquiries only, please. Test drives 
-          welcome during daylight hours. Located in {product.location}.
+          Well-maintained vehicle with excellent condition. Clean title, no
+          accidents. Recent service records available. Serious inquiries only,
+          please. Test drives welcome during daylight hours. Located in{" "}
+          {product.location}.
         </p>
       </div>
 

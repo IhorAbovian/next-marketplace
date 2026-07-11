@@ -43,9 +43,7 @@ export default function ProductCard({
           <p className="text-gray-500 text-sm font-bold mb-1 truncate">
             {location}
           </p>
-          <p className="text-gray-800 font-bold text-sm truncate">
-            ${price.toLocaleString()}
-          </p>
+          <p className="text-gray-800 font-bold text-sm truncate">${price}</p>
         </CardContent>
       </Card>
     </Link>

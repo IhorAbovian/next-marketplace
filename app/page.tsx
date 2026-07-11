@@ -1,5 +1,7 @@
 import CategoryGrid from "@/components/sections/CategoryGrid";
+import PopularListingsGrid from "@/components/sections/PopularListingsGrid";
 import type { Category } from "@/components/sections/CategoryGrid";
+import { popularAutosListings, popularRealEstateListings } from "@/lib/data";
 
 const autoCategories: Category[] = [
   {
@@ -48,6 +50,20 @@ export default function HomePage() {
         title="Real Estate Categories"
         linkText="View all properties"
         categories={realEstateCategories}
+        viewAllHref="/real-estate"
+      />
+
+      {/* Popular Autos Listings Section */}
+      <PopularListingsGrid
+        title="Popular listings in Autos"
+        listings={popularAutosListings}
+        viewAllHref="/cars"
+      />
+
+      {/* Popular Real Estate Listings Section */}
+      <PopularListingsGrid
+        title="Popular listings in Real Estate"
+        listings={popularRealEstateListings}
         viewAllHref="/real-estate"
       />
     </main>

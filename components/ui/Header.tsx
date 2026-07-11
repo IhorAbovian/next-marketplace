@@ -73,12 +73,6 @@ export default function Header() {
 
                   <NavigationMenuContent>
                     <div className="flex flex-col gap-2 p-4 w-48">
-                      <NavigationMenuLink
-                        href={category.href}
-                        className="px-4 py-2 font-medium hover:bg-gray-100 rounded"
-                      >
-                        All {category.name}
-                      </NavigationMenuLink>
                       {category.subcategories.map((subcategory) => (
                         <NavigationMenuLink
                           key={subcategory.id}

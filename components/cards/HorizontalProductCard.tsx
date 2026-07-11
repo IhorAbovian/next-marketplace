@@ -44,9 +44,7 @@ export default function HorizontalProductCard({
               </p>
             </div>
 
-            <p className="text-lg font-bold text-gray-800 mt-2">
-              ${price.toLocaleString()}
-            </p>
+            <p className="text-lg font-bold text-gray-800 mt-2">${price}</p>
           </div>
         </CardContent>
       </Card>
