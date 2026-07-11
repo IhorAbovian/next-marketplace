@@ -1,5 +1,6 @@
 import "./globals.css";
 import Header from "@/components/ui/Header";
+import Footer from "@/components/ui/Footer";
 
 export const metadata = {
   title: "My Next Marketplace",
@@ -13,10 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-gray-100 min-h-screen">
+      <body className="bg-gray-100 min-h-screen flex flex-col">
         <Header />
 
-        {children}
+        <main className="flex-1">{children}</main>
+
+        <Footer />
       </body>
     </html>
   );

@@ -1,7 +1,28 @@
+"use client";
+
+import ListingSection from "@/components/sections/ListingSection";
+
+const forRentListings = [
+  {
+    id: "1",
+    title: "Downtown Loft for Rent",
+    price: 2500,
+    image: "https://placehold.co/400x300",
+    location: "Chicago, IL",
+    description:
+      "1BR loft in historic building. High ceilings, exposed brick, in-unit laundry.",
+  },
+  {
+    id: "2",
+    title: "Suburban Family Home",
+    price: 3200,
+    image: "https://placehold.co/400x300",
+    location: "Minneapolis, MN",
+    description:
+      "4BR home in excellent school district. Updated kitchen, finished basement.",
+  },
+];
+
 export default function ForRentPage() {
-  return (
-    <div>
-      <h1>For Rent</h1>
-    </div>
-  );
+  return <ListingSection title="For Rent" listings={forRentListings} />;
 }
