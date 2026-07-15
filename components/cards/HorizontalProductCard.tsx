@@ -11,6 +11,8 @@ export type HorizontalProductCardProps = {
   image: string;
   location: string;
   description?: string;
+  category?: string;
+  subcategory?: string;
 };
 
 export default function HorizontalProductCard({
@@ -20,9 +22,14 @@ export default function HorizontalProductCard({
   image,
   location,
   description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+  category = "autos",
+  subcategory,
 }: HorizontalProductCardProps) {
+  const href = subcategory
+    ? `/${category}/${subcategory}/${id}`
+    : `/${category}/${id}`;
   return (
-    <Link href={`/product/${id}`}>
+    <Link href={href}>
       <Card className="w-full hover:shadow-md transition-shadow">
         <CardContent className="p-3 flex gap-3">
           <div className="relative w-48 h-48 shrink-0">

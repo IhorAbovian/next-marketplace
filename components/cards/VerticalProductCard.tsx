@@ -11,6 +11,8 @@ export type VerticalProductCardProps = {
   image: string;
   location: string;
   description?: string;
+  category?: string;
+  subcategory?: string;
 };
 
 export default function VerticalProductCard({
@@ -19,9 +21,14 @@ export default function VerticalProductCard({
   price,
   image,
   location,
+  category = "autos",
+  subcategory,
 }: VerticalProductCardProps) {
+  const href = subcategory
+    ? `/${category}/${subcategory}/${id}`
+    : `/${category}/${id}`;
   return (
-    <Link href={`/product/${id}`}>
+    <Link href={href}>
       <Card className="w-full hover:shadow-md transition-shadow">
         <CardContent className="p-2">
           <div className="relative h-36 mb-2">

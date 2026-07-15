@@ -12,19 +12,60 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  name      String?
+  phone     String?    @unique
+  image     String?
+  listings  Listing[]
+  favorites Favorite[]
+}
 
+model Listing {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  price       Decimal
+  location    String
+  images      Image[]
+  categoryId  Int
+  authorId    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-model User { 
-  id    Int     @id @default(autoincrement()) 
-  email String  @unique
-  name  String?
-  posts Post[]
-} 
-model Post { 
-  id        Int     @id @default(autoincrement()) 
-  title     String
-  content   String?
-  published Boolean @default(false) 
-  author    User    @relation(fields: [authorId], references: [id]) 
-  authorId  Int
-} 
+  category  Category   @relation(fields: [categoryId], references: [id])
+  author    User       @relation(fields: [authorId], references: [id])
+  favorites Favorite[]
+}
+
+model Image {
+  id        Int    @id @default(autoincrement())
+  url       String
+  listingId Int
+
+  listing Listing @relation(fields: [listingId], references: [id])
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  slug     String    @unique
+  parentId Int?
+  listings Listing[]
+
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  listingId Int
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  listing Listing @relation(fields: [listingId], references: [id])
+
+  @@unique([userId, listingId])
+}

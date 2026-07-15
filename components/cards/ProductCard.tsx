@@ -17,6 +17,7 @@ export type ProductCardProps = {
   price: number;
   image: string;
   location: string;
+  category?: string;
 };
 
 export default function ProductCard({
@@ -25,9 +26,10 @@ export default function ProductCard({
   price,
   image,
   location,
+  category = "autos",
 }: ProductCardProps) {
   return (
-    <Link href={`/product/${id}`}>
+    <Link href={`/${category}/${id}`}>
       <Card className="w-64 shrink-0">
         <CardContent className="p-2">
           <div className="relative h-32 mb-1">

@@ -2,22 +2,23 @@ import CategoryGrid from "@/components/sections/CategoryGrid";
 import PopularListingsGrid from "@/components/sections/PopularListingsGrid";
 import type { Category } from "@/components/sections/CategoryGrid";
 import { popularAutosListings, popularRealEstateListings } from "@/lib/data";
+import { prisma } from "@/lib/prisma";
 
 const autoCategories: Category[] = [
   {
     id: 1,
     name: "Cars & Trucks",
-    href: "/cars",
+    href: "/autos/cars-trucks",
   },
   {
     id: 2,
     name: "Motorcycles",
-    href: "/cars/motorcycles",
+    href: "/autos/motorcycles",
   },
   {
     id: 3,
     name: "Boats",
-    href: "/cars/boats",
+    href: "/autos/boats",
   },
 ];
 
@@ -34,37 +35,32 @@ const realEstateCategories: Category[] = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const users = await prisma.user.findMany();
+
+  console.log({ users });
+
   return (
     <main className="container max-w-7xl mx-auto px-4 pt-8">
       {/* Auto Categories Section */}
-      <CategoryGrid
-        title="Auto Categories"
-        linkText="View all categories"
-        categories={autoCategories}
-        viewAllHref="/cars"
-      />
+      <CategoryGrid title="Auto Categories" categories={autoCategories} />
 
       {/* Real Estate Categories Section */}
       <CategoryGrid
         title="Real Estate Categories"
-        linkText="View all properties"
         categories={realEstateCategories}
-        viewAllHref="/real-estate"
       />
 
       {/* Popular Autos Listings Section */}
       <PopularListingsGrid
         title="Popular listings in Autos"
         listings={popularAutosListings}
-        viewAllHref="/cars"
       />
 
       {/* Popular Real Estate Listings Section */}
       <PopularListingsGrid
         title="Popular listings in Real Estate"
         listings={popularRealEstateListings}
-        viewAllHref="/real-estate"
       />
     </main>
   );

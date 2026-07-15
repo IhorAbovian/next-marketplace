@@ -27,6 +27,8 @@ export default function ListingSection({
             image={listing.image}
             location={listing.location}
             description={listing.description}
+            category={listing.category}
+            subcategory={listing.subcategory}
           />
         ))}
       </div>

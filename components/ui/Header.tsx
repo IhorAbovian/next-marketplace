@@ -15,12 +15,12 @@ import { usePathname } from "next/navigation";
 const categories = [
   {
     id: 1,
-    name: "Cars and Vehicles",
-    href: "/cars",
+    name: "Autos",
+    href: "/autos",
     subcategories: [
-      { id: 1, name: "Cars & Trucks", href: "/cars" },
-      { id: 2, name: "Motorcycles", href: "/cars/motorcycles" },
-      { id: 3, name: "Boats", href: "/cars/boats" },
+      { id: 1, name: "Cars & Trucks", href: "/autos/cars-trucks" },
+      { id: 2, name: "Motorcycles", href: "/autos/motorcycles" },
+      { id: 3, name: "Boats", href: "/autos/boats" },
     ],
   },
   {

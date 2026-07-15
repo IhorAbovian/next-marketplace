@@ -17,24 +17,11 @@ export interface CategoryGridProps {
   viewAllHref?: string;
 }
 
-export default function CategoryGrid({
-  title,
-  linkText = "View all",
-  categories,
-  viewAllHref,
-}: CategoryGridProps) {
+export default function CategoryGrid({ title, categories }: CategoryGridProps) {
   return (
     <section className="py-12">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-        {viewAllHref && (
-          <Link
-            href={viewAllHref}
-            className="text-sm font-semibold text-gray-800 hover:text-gray-600 transition-colors"
-          >
-            {linkText} →
-          </Link>
-        )}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
