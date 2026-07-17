@@ -15,9 +15,24 @@ import { FaHouse } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function SearchBar() {
+interface CategoryFromDB {
+  id: number;
+  name: string;
+  slug: string;
+  children: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
+}
+
+interface SearchBarProps {
+  categories?: CategoryFromDB[];
+}
+
+export default function SearchBar({ categories }: SearchBarProps) {
   const router = useRouter();
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState<string | null>("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,22 +57,26 @@ export default function SearchBar() {
         <SelectContent>
           <SelectItem value="">All Categories</SelectItem>
           <SelectSeparator />
-          <SelectGroup>
-            <SelectLabel>
-              <FaCar className="inline mr-2" /> Autos
-            </SelectLabel>
-            <SelectItem value="/autos/cars-trucks">Cars & Trucks</SelectItem>
-            <SelectItem value="/autos/motorcycles">Motorcycles</SelectItem>
-            <SelectItem value="/autos/boats">Boats</SelectItem>
-          </SelectGroup>
-          <SelectSeparator />
-          <SelectGroup>
-            <SelectLabel>
-              <FaHouse className="inline mr-2" /> Real Estate
-            </SelectLabel>
-            <SelectItem value="/real-estate/for-sale">For Sale</SelectItem>
-            <SelectItem value="/real-estate/for-rent">For Rent</SelectItem>
-          </SelectGroup>
+          {categories?.map((category) => (
+            <SelectGroup key={category.id}>
+              <SelectLabel>
+                {category.slug === "autos" ? (
+                  <FaCar className="inline mr-2" />
+                ) : (
+                  <FaHouse className="inline mr-2" />
+                )}
+                {category.name}
+              </SelectLabel>
+              {category.children.map((child) => (
+                <SelectItem
+                  key={child.id}
+                  value={`/${category.slug}/${child.slug}`}
+                >
+                  {child.name}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          ))}
         </SelectContent>
       </Select>
       <button

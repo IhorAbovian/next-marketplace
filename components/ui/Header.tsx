@@ -43,7 +43,9 @@ export default function Header({
           Marketplace
         </Link>
 
-        <div className="flex-1">{!isAuthPage && <SearchBar />}</div>
+        <div className="flex-1">
+          {!isAuthPage && <SearchBar categories={categoriesFromLayout} />}
+        </div>
 
         <div className="flex items-center gap-2">
           <Link href="/sign-up" className="hover:underline">
