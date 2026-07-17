@@ -9,7 +9,8 @@
 ALTER TABLE "Post" DROP CONSTRAINT "Post_authorId_fkey";
 
 -- AlterTable
-ALTER TABLE "User" ADD COLUMN     "name" TEXT,
+ALTER TABLE "User" ADD COLUMN     "image" TEXT,
+ADD COLUMN     "name" TEXT,
 ADD COLUMN     "phone" TEXT;
 
 -- DropTable

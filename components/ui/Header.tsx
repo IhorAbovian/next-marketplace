@@ -12,32 +12,29 @@ import {
 } from "./navigation-menu";
 import { usePathname } from "next/navigation";
 
-const categories = [
-  {
-    id: 1,
-    name: "Autos",
-    href: "/autos",
-    subcategories: [
-      { id: 1, name: "Cars & Trucks", href: "/autos/cars-trucks" },
-      { id: 2, name: "Motorcycles", href: "/autos/motorcycles" },
-      { id: 3, name: "Boats", href: "/autos/boats" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Real Estate",
-    href: "/real-estate",
-    subcategories: [
-      { id: 1, name: "For Sale", href: "/real-estate/for-sale" },
-      { id: 2, name: "For Rent", href: "/real-estate/for-rent" },
-    ],
-  },
-];
+interface CategoryFromDB {
+  id: number;
+  name: string;
+  slug: string;
+  children: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
+}
 
-export default function Header() {
+interface HeaderProps {
+  categories?: CategoryFromDB[];
+}
+
+export default function Header({
+  categories: categoriesFromLayout,
+}: HeaderProps) {
   const pathname = usePathname();
   const isAuthPage =
     pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
+
+  const categories = categoriesFromLayout || [];
 
   return (
     <header className="border-b border-gray-200 bg-white">
@@ -73,13 +70,13 @@ export default function Header() {
 
                   <NavigationMenuContent>
                     <div className="flex flex-col gap-2 p-4 w-48">
-                      {category.subcategories.map((subcategory) => (
+                      {category.children.map((child) => (
                         <NavigationMenuLink
-                          key={subcategory.id}
-                          href={subcategory.href}
+                          key={child.id}
+                          href={`/${category.slug}/${child.slug}`}
                           className="px-4 py-2 hover:bg-gray-100 rounded"
                         >
-                          {subcategory.name}
+                          {child.name}
                         </NavigationMenuLink>
                       ))}
                     </div>
