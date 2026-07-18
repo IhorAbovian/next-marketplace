@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "TURBOPACK=false next dev",
+    "dev-win": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gen": "npx prisma migrate dev && npx prisma generate"
+    "gen": "npx prisma migrate dev && npx prisma generate",
+    "ps": "npx prisma studio"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

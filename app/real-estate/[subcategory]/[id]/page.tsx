@@ -3,22 +3,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { products } from "@/lib/data";
+import { listings } from "@/lib/data";
 import { use } from "react";
 
-export default function ProductPage({
+export default function ListingPage({
   params,
 }: {
   params: Promise<{ subcategory: string; id: string }>;
 }) {
   const { subcategory, id } = use(params);
-  const product = products.find((p) => p.id === id);
+  const product = listings.find((p) => p.id === id);
 
   if (!product) {
     return (
       <div className="container max-w-4xl mx-auto px-4 py-6">
         <p className="text-red-600 font-semibold">
-          Product not found - ID: {id}
+          listing not found - ID: {id}
         </p>
         <Link
           href="/"
@@ -93,7 +93,7 @@ export default function ProductPage({
           </div>
         </div>
 
-        {/* Product Info */}
+        {/* listing Info */}
         <div className="space-y-4">
           <h1 className="text-2xl font-bold">{product.title}</h1>
 

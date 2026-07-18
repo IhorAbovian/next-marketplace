@@ -1,7 +1,7 @@
-import { ProductCardProps } from "@/components/cards/ProductCard";
-import { HorizontalProductCardProps } from "@/components/cards/HorizontalProductCard";
+import { ListingCardProps } from "@/components/cards/ListingCard";
+import { HorizontalListingCardProps } from "@/components/cards/HorizontalListingCard";
 
-export type Product = {
+export type Listing = {
   id: string;
   title: string;
   price: number;
@@ -10,7 +10,7 @@ export type Product = {
   category: string;
 };
 
-export const products: Product[] = [
+export const listings: Listing[] = [
   // Cars & Trucks
   {
     id: "car-1",
@@ -122,7 +122,7 @@ export const products: Product[] = [
   },
 ];
 
-export const popularAutosListings: HorizontalProductCardProps[] = [
+export const popularAutosListings: HorizontalListingCardProps[] = [
   {
     id: "car-1",
     title: "2023 Toyota Camry",
@@ -155,7 +155,7 @@ export const popularAutosListings: HorizontalProductCardProps[] = [
   },
 ];
 
-export const popularRealEstateListings: HorizontalProductCardProps[] = [
+export const popularRealEstateListings: HorizontalListingCardProps[] = [
   {
     id: "re-1",
     title: "Modern Apartment Downtown",

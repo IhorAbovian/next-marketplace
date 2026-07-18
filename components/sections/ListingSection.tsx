@@ -1,12 +1,12 @@
 "use client";
 
-import HorizontalProductCard, {
-  HorizontalProductCardProps,
-} from "@/components/cards/HorizontalProductCard";
+import HorizontalListingCard, {
+  HorizontalListingCardProps,
+} from "@/components/cards/HorizontalListingCard";
 
 export type ListingSectionProps = {
   title: string;
-  listings: HorizontalProductCardProps[];
+  listings: HorizontalListingCardProps[];
 };
 
 export default function ListingSection({
@@ -19,7 +19,7 @@ export default function ListingSection({
 
       <div className="flex flex-col gap-4">
         {listings.map((listing) => (
-          <HorizontalProductCard
+          <HorizontalListingCard
             key={listing.id}
             id={listing.id}
             title={listing.title}

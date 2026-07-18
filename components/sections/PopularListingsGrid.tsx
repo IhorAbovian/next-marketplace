@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import VerticalProductCard, {
-  VerticalProductCardProps,
-} from "@/components/cards/VerticalProductCard";
+import VerticalListingCard, {
+  VerticalListingCardProps,
+} from "@/components/cards/VerticalListingCard";
 
 export type PopularListingsGridProps = {
   title: string;
-  listings: VerticalProductCardProps[];
+  listings: VerticalListingCardProps[];
 };
 
 export default function PopularListingsGrid({
@@ -22,7 +22,7 @@ export default function PopularListingsGrid({
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {listings.map((listing) => (
-          <VerticalProductCard
+          <VerticalListingCard
             key={listing.id}
             id={listing.id}
             title={listing.title}

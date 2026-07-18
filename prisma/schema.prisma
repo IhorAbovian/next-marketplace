@@ -4,7 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   output   = "../generated/prisma"
 }
 
@@ -13,7 +13,7 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(cuid())
   email     String     @unique
   name      String?
   phone     String?    @unique
@@ -23,14 +23,14 @@ model User {
 }
 
 model Listing {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(cuid())
   title       String
   description String?
   price       Decimal
   location    String
   images      Image[]
-  categoryId  Int
-  authorId    Int
+  categoryId  String
+  authorId    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -40,18 +40,18 @@ model Listing {
 }
 
 model Image {
-  id        Int    @id @default(autoincrement())
+  id        String @id @default(cuid())
   url       String
-  listingId Int
+  listingId String
 
   listing Listing @relation(fields: [listingId], references: [id])
 }
 
 model Category {
-  id       Int       @id @default(autoincrement())
+  id       String    @id @default(cuid())
   name     String
   slug     String    @unique
-  parentId Int?
+  parentId String?
   listings Listing[]
 
   parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
@@ -59,9 +59,9 @@ model Category {
 }
 
 model Favorite {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  listingId Int
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
   createdAt DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id])

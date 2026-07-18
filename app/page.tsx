@@ -4,41 +4,32 @@ import type { Category } from "@/components/sections/CategoryGrid";
 import { popularAutosListings, popularRealEstateListings } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 
-const autoCategories: Category[] = [
-  {
-    id: 1,
-    name: "Cars & Trucks",
-    href: "/autos/cars-trucks",
-  },
-  {
-    id: 2,
-    name: "Motorcycles",
-    href: "/autos/motorcycles",
-  },
-  {
-    id: 3,
-    name: "Boats",
-    href: "/autos/boats",
-  },
-];
-
-const realEstateCategories: Category[] = [
-  {
-    id: 1,
-    name: "For Sale",
-    href: "/real-estate/for-sale",
-  },
-  {
-    id: 2,
-    name: "For Rent",
-    href: "/real-estate/for-rent",
-  },
-];
-
 export default async function HomePage() {
-  const users = await prisma.user.findMany();
+  const categories = await prisma.category.findMany({
+    select: {
+      name: true,
+      slug: true,
+      children: { select: { name: true, slug: true } },
+    },
+  });
 
-  console.log({ users });
+  const autoCategories: Category[] =
+    categories
+      .find((c) => c.slug === "autos")
+      ?.children.map((child) => ({
+        id: child.slug,
+        name: child.name,
+        href: `/autos/${child.slug}`,
+      })) || [];
+
+  const realEstateCategories: Category[] =
+    categories
+      .find((c) => c.slug === "real-estate")
+      ?.children.map((child) => ({
+        id: child.slug,
+        name: child.name,
+        href: `/real-estate/${child.slug}`,
+      })) || [];
 
   return (
     <main className="container max-w-7xl mx-auto px-4 pt-8">

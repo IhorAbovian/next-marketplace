@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { products } from "@/lib/data";
 import { use } from "react";
 
-export default function ProductPage({
+export default function ListingPage({
   params,
 }: {
   params: Promise<{ subcategory: string; id: string }>;
@@ -18,7 +18,7 @@ export default function ProductPage({
     return (
       <div className="container max-w-4xl mx-auto px-4 py-6">
         <p className="text-red-600 font-semibold">
-          Product not found - ID: {id}
+          listing not found - ID: {id}
         </p>
         <Link
           href="/"
@@ -91,7 +91,7 @@ export default function ProductPage({
           </div>
         </div>
 
-        {/* Product Info */}
+        {/* listing Info */}
         <div className="space-y-4">
           <h1 className="text-2xl font-bold">{product.title}</h1>
 
