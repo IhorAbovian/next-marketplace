@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { products } from "@/lib/data";
+import { listings } from "@/lib/data";
 import { use } from "react";
 
 export default function ListingPage({
@@ -12,7 +12,7 @@ export default function ListingPage({
   params: Promise<{ subcategory: string; id: string }>;
 }) {
   const { subcategory, id } = use(params);
-  const product = products.find((p) => p.id === id);
+  const product = listings.find((p) => p.id === id);
 
   if (!product) {
     return (

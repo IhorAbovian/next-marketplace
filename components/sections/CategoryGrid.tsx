@@ -1,10 +1,7 @@
-"use client";
-
 import Link from "next/link";
-import { ReactNode } from "react";
 
 export interface Category {
-  id: string | number;
+  id: string;
   name: string;
   href: string;
   color?: string;
@@ -12,9 +9,7 @@ export interface Category {
 
 export interface CategoryGridProps {
   title: string;
-  linkText?: string;
   categories: Category[];
-  viewAllHref?: string;
 }
 
 export default function CategoryGrid({ title, categories }: CategoryGridProps) {
