@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -13,59 +8,55 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(cuid())
+  id        Int        @id @default(autoincrement())
   email     String     @unique
+  image     String?
   name      String?
   phone     String?    @unique
-  image     String?
-  listings  Listing[]
   favorites Favorite[]
+  listings  Listing[]
 }
 
 model Listing {
-  id          String   @id @default(cuid())
+  id          Int        @id @default(autoincrement())
   title       String
   description String?
   price       Decimal
   location    String
+  categoryId  Int
+  authorId    Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  favorites   Favorite[]
   images      Image[]
-  categoryId  String
-  authorId    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  category  Category   @relation(fields: [categoryId], references: [id])
-  author    User       @relation(fields: [authorId], references: [id])
-  favorites Favorite[]
+  author      User       @relation(fields: [authorId], references: [id])
+  category    Category   @relation(fields: [categoryId], references: [id])
 }
 
 model Image {
-  id        String @id @default(cuid())
+  id        Int     @id @default(autoincrement())
   url       String
-  listingId String
-
-  listing Listing @relation(fields: [listingId], references: [id])
+  listingId Int
+  listing   Listing @relation(fields: [listingId], references: [id])
 }
 
 model Category {
-  id       String    @id @default(cuid())
+  id       Int        @id @default(autoincrement())
   name     String
-  slug     String    @unique
-  parentId String?
-  listings Listing[]
-
+  slug     String     @unique
+  parentId Int?
   parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children Category[] @relation("CategoryHierarchy")
+  listings Listing[]
 }
 
 model Favorite {
-  id        String   @id @default(cuid())
-  userId    String
-  listingId String
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  listingId Int
   createdAt DateTime @default(now())
-
-  user    User    @relation(fields: [userId], references: [id])
-  listing Listing @relation(fields: [listingId], references: [id])
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, listingId])
 }

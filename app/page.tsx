@@ -1,7 +1,6 @@
 import CategoryGrid from "@/components/sections/CategoryGrid";
 import PopularListingsGrid from "@/components/sections/PopularListingsGrid";
 import type { Category } from "@/components/sections/CategoryGrid";
-import { popularAutosListings, popularRealEstateListings } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 
 export default async function HomePage() {
@@ -10,6 +9,30 @@ export default async function HomePage() {
       name: true,
       slug: true,
       children: { select: { name: true, slug: true } },
+    },
+  });
+
+  const popularAutosListings = await prisma.listing.findMany({
+    where: { category: { slug: "autos" } },
+    take: 5,
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      location: true,
+      images: { take: 1, select: { url: true } },
+    },
+  });
+
+  const popularRealEstateListings = await prisma.listing.findMany({
+    where: { category: { slug: "real-estate" } },
+    take: 5,
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      location: true,
+      images: { take: 1, select: { url: true } },
     },
   });
 
@@ -31,6 +54,26 @@ export default async function HomePage() {
         href: `/real-estate/${child.slug}`,
       })) || [];
 
+  const popularAutosListingsWithImages = popularAutosListings.map(
+    (listing) => ({
+      id: listing.id.toString(),
+      title: listing.title,
+      price: Number(listing.price),
+      location: listing.location,
+      image: listing.images[0]?.url || "https://placehold.co/400x300",
+    }),
+  );
+
+  const popularRealEstateListingsWithImages = popularRealEstateListings.map(
+    (listing) => ({
+      id: listing.id.toString(),
+      title: listing.title,
+      price: Number(listing.price),
+      location: listing.location,
+      image: listing.images[0]?.url || "https://placehold.co/400x300",
+    }),
+  );
+
   return (
     <main className="container max-w-7xl mx-auto px-4 pt-8">
       {/* Auto Categories Section */}
@@ -45,13 +88,13 @@ export default async function HomePage() {
       {/* Popular Autos Listings Section */}
       <PopularListingsGrid
         title="Popular listings in Autos"
-        listings={popularAutosListings}
+        listings={popularAutosListingsWithImages}
       />
 
       {/* Popular Real Estate Listings Section */}
       <PopularListingsGrid
         title="Popular listings in Real Estate"
-        listings={popularRealEstateListings}
+        listings={popularRealEstateListingsWithImages}
       />
     </main>
   );
