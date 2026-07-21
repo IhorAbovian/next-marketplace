@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export default async function CarsTrucksPage() {
   const rawListings = await prisma.listing.findMany({
     where: { category: { slug: "cars-trucks" } },
-    take: 20,
+    take: 10,
     select: {
       id: true,
       title: true,

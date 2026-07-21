@@ -1,32 +1,30 @@
-"use client";
-
 import ListingSection from "@/components/sections/ListingSection";
+import { prisma } from "@/lib/prisma";
 
-const forSaleListings = [
-  {
-    id: "fs-1",
-    title: "Luxury Condo for Sale",
-    price: 750000,
-    image: "https://placehold.co/400x300",
-    location: "New York, NY",
-    description:
-      "3BR penthouse with panoramic city views. Building amenities include gym and pool.",
+export default async function ForSalePage() {
+  const rawListings = await prisma.listing.findMany({
+    where: { category: { slug: "for-sale" } },
+    take: 20,
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      location: true,
+      description: true,
+      images: { take: 1, select: { url: true } },
+    },
+  });
+
+  const forSaleListings = rawListings.map((listing) => ({
+    id: listing.id.toString(),
+    title: listing.title,
+    price: Number(listing.price),
+    location: listing.location,
+    description: listing.description ?? undefined,
+    image: listing.images[0]?.url || "https://placehold.co/400x300",
     category: "real-estate",
     subcategory: "for-sale",
-  },
-  {
-    id: "fs-2",
-    title: "Cozy Cottage",
-    price: 320000,
-    image: "https://placehold.co/400x300",
-    location: "Denver, CO",
-    description:
-      "2BR mountain cottage with updated kitchen. Perfect vacation or primary home.",
-    category: "real-estate",
-    subcategory: "for-sale",
-  },
-];
+  }));
 
-export default function ForSalePage() {
   return <ListingSection title="For Sale" listings={forSaleListings} />;
 }
