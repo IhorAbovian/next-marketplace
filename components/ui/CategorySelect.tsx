@@ -13,6 +13,8 @@ import {
 import type { Prisma } from "@/generated/prisma/browser";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FaCar } from "react-icons/fa";
+import { FaHouse } from "react-icons/fa6";
 
 type CategoryWithRelations = Prisma.CategoryGetPayload<{
   select: {
@@ -54,7 +56,14 @@ export default function CategorySelect({
 
         {categories.map((category) => (
           <SelectGroup key={category.slug}>
-            <SelectLabel>{category.name}</SelectLabel>
+            <SelectLabel>
+              {category.slug === "autos" ? (
+                <FaCar className="inline mr-2" />
+              ) : (
+                <FaHouse className="inline mr-2" />
+              )}
+              {category.name}
+            </SelectLabel>
             {category.children.map((child) => (
               <SelectItem
                 key={child.slug}

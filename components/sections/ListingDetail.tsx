@@ -30,10 +30,7 @@ export default async function ListingPage({
     return (
       <div className="container max-w-4xl mx-auto px-4 py-6">
         <p className="text-red-600 font-semibold">Listing not found</p>
-        <Link
-          href="/"
-          className="text-blue-600 hover:underline mt-4 inline-block"
-        >
+        <Link href="/" className="text-blue-600 hover:underline mt-4 inline-block">
           Back to Home
         </Link>
       </div>
@@ -52,13 +49,9 @@ export default async function ListingPage({
     <div className="container max-w-4xl mx-auto px-4 py-6">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-4">
-        <Link href="/" className="hover:text-gray-700">
-          Home
-        </Link>
+        <Link href="/" className="hover:text-gray-700">Home</Link>
         <span className="mx-2">›</span>
-        <Link href="/autos" className="hover:text-gray-700">
-          Autos
-        </Link>
+        <Link href="/autos" className="hover:text-gray-700">Autos</Link>
         <span className="mx-2">›</span>
         <Link href={`/autos/${subcategory}`} className="hover:text-gray-700">
           {label}
@@ -90,30 +83,10 @@ export default async function ListingPage({
             <span className="text-sm text-gray-500">USD</span>
           </div>
           <p className="text-gray-600">{listing.location}</p>
+          <p className="text-gray-700">{listing.description}</p>
           <Button className="w-full py-3">Contact Seller</Button>
-
-          <div className="border-t pt-4">
-            <h3 className="font-semibold mb-2">Seller Information</h3>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                <span className="text-lg font-bold text-gray-600">JD</span>
-              </div>
-              <div>
-                <p className="font-medium">John Doe</p>
-                <p className="text-sm text-gray-500">Member since 2020</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-
-      {/* Description */}
-      {listing.description && (
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Description</h2>
-          <p className="text-gray-700 leading-relaxed">{listing.description}</p>
-        </div>
-      )}
     </div>
   );
 }

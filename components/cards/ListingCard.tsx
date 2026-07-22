@@ -18,6 +18,7 @@ export type ListingCardProps = {
   image: string;
   location: string;
   category?: string;
+  subcategory?: string;
 };
 
 export default function ListingCard({
@@ -27,6 +28,7 @@ export default function ListingCard({
   image,
   location,
   category = "autos",
+  subcategory,
 }: ListingCardProps) {
   // id,
   // title,
@@ -36,7 +38,7 @@ export default function ListingCard({
   // category = "autos",
 
   return (
-    <Link href={`/${category}/${id}`}>
+    <Link href={`/${category}/${subcategory ? `${subcategory}/` : ""}${id}`}>
       <Card className="w-64 shrink-0">
         <CardContent className="p-2">
           <div className="relative h-32 mb-1">

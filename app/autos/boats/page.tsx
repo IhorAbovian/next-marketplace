@@ -21,6 +21,8 @@ export default async function BoatsPage() {
     location: listing.location,
     description: listing.description ?? undefined,
     image: listing.images[0]?.url || "https://placehold.co/400x300",
+    category: "autos",
+    subcategory: "boats",
   }));
 
   return <ListingSection title="Boats" listings={boatListings} />;

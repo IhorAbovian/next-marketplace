@@ -12,6 +12,7 @@ export default async function MotorcyclesPage() {
       location: true,
       description: true,
       images: { take: 1, select: { url: true } },
+      category: { select: { slug: true } },
     },
   });
 

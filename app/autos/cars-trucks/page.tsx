@@ -12,6 +12,7 @@ export default async function CarsTrucksPage() {
       location: true,
       description: true,
       images: { take: 1, select: { url: true } },
+      category: { select: { slug: true } },
     },
   });
 
@@ -22,6 +23,8 @@ export default async function CarsTrucksPage() {
     location: listing.location,
     description: listing.description ?? undefined,
     image: listing.images[0]?.url || "https://placehold.co/400x300",
+    category: "autos",
+    subcategory: "cars-trucks",
   }));
 
   return <ListingSection title="Cars & Trucks" listings={listings} />;

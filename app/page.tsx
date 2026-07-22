@@ -21,6 +21,7 @@ export default async function HomePage() {
       price: true,
       location: true,
       images: { take: 1, select: { url: true } },
+      category: { select: { slug: true } },
     },
   });
 
@@ -33,6 +34,7 @@ export default async function HomePage() {
       price: true,
       location: true,
       images: { take: 1, select: { url: true } },
+      category: { select: { slug: true } },
     },
   });
 
@@ -61,6 +63,8 @@ export default async function HomePage() {
       price: Number(listing.price),
       location: listing.location,
       image: listing.images[0]?.url || "https://placehold.co/400x300",
+      category: "autos",
+      subcategory: listing.category.slug,
     }),
   );
 
@@ -71,6 +75,8 @@ export default async function HomePage() {
       price: Number(listing.price),
       location: listing.location,
       image: listing.images[0]?.url || "https://placehold.co/400x300",
+      category: "real-estate",
+      subcategory: listing.category.slug,
     }),
   );
 
