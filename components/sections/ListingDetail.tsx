@@ -12,7 +12,7 @@ export default async function ListingPage({
 
   const listing = await prisma.listing.findFirst({
     where: {
-      id: parseInt(id),
+      id,
       category: { slug: subcategory },
     },
     select: {
@@ -30,7 +30,10 @@ export default async function ListingPage({
     return (
       <div className="container max-w-4xl mx-auto px-4 py-6">
         <p className="text-red-600 font-semibold">Listing not found</p>
-        <Link href="/" className="text-blue-600 hover:underline mt-4 inline-block">
+        <Link
+          href="/"
+          className="text-blue-600 hover:underline mt-4 inline-block"
+        >
           Back to Home
         </Link>
       </div>
@@ -49,9 +52,13 @@ export default async function ListingPage({
     <div className="container max-w-4xl mx-auto px-4 py-6">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-4">
-        <Link href="/" className="hover:text-gray-700">Home</Link>
+        <Link href="/" className="hover:text-gray-700">
+          Home
+        </Link>
         <span className="mx-2">›</span>
-        <Link href="/autos" className="hover:text-gray-700">Autos</Link>
+        <Link href="/autos" className="hover:text-gray-700">
+          Autos
+        </Link>
         <span className="mx-2">›</span>
         <Link href={`/autos/${subcategory}`} className="hover:text-gray-700">
           {label}

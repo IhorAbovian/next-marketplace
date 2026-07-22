@@ -12,7 +12,7 @@ export default async function ListingPage({
 
   const listing = await prisma.listing.findFirst({
     where: {
-      id: parseInt(id),
+      id,
       category: { slug: subcategory },
     },
     select: {

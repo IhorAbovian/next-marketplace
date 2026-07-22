@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(cuid())
   email     String     @unique
   image     String?
   name      String?
@@ -18,13 +18,13 @@ model User {
 }
 
 model Listing {
-  id          Int        @id @default(autoincrement())
+  id          String        @id @default(cuid())
   title       String
   description String?
   price       Decimal
   location    String
-  categoryId  Int
-  authorId    Int
+  categoryId  String
+  authorId    String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   favorites   Favorite[]
@@ -34,26 +34,26 @@ model Listing {
 }
 
 model Image {
-  id        Int     @id @default(autoincrement())
+  id        String     @id @default(cuid())
   url       String
-  listingId Int
+  listingId String
   listing   Listing @relation(fields: [listingId], references: [id])
 }
 
 model Category {
-  id       Int        @id @default(autoincrement())
+  id       String     @id @default(cuid())
   name     String
   slug     String     @unique
-  parentId Int?
+  parentId String?
   parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children Category[] @relation("CategoryHierarchy")
   listings Listing[]
 }
 
 model Favorite {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  listingId Int
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
   createdAt DateTime @default(now())
   listing   Listing  @relation(fields: [listingId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
