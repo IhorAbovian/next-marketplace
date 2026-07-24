@@ -1,6 +1,5 @@
-import CategoryGrid from "@/components/sections/CategoryGrid";
+import SubCategoryGrid from "@/components/sections/SubCategoryGrid";
 import PopularListingsGrid from "@/components/sections/PopularListingsGrid";
-import type { Category } from "@/components/sections/CategoryGrid";
 import { prisma } from "@/lib/prisma";
 
 export default async function HomePage() {
@@ -38,70 +37,28 @@ export default async function HomePage() {
     },
   });
 
-  const autoCategories: Category[] =
-    categories
-      .find((c) => c.slug === "autos")
-      ?.children.map((child) => ({
-        id: child.slug,
-        name: child.name,
-        href: `/autos/${child.slug}`,
-      })) || [];
-
-  const realEstateCategories: Category[] =
-    categories
-      .find((c) => c.slug === "real-estate")
-      ?.children.map((child) => ({
-        id: child.slug,
-        name: child.name,
-        href: `/real-estate/${child.slug}`,
-      })) || [];
-
-  const popularAutosListingsWithImages = popularAutosListings.map(
-    (listing) => ({
-      id: listing.id.toString(),
-      title: listing.title,
-      price: Number(listing.price),
-      location: listing.location,
-      image: listing.images[0]?.url || "https://placehold.co/400x300",
-      category: "autos",
-      subcategory: listing.category.slug,
-    }),
-  );
-
-  const popularRealEstateListingsWithImages = popularRealEstateListings.map(
-    (listing) => ({
-      id: listing.id.toString(),
-      title: listing.title,
-      price: Number(listing.price),
-      location: listing.location,
-      image: listing.images[0]?.url || "https://placehold.co/400x300",
-      category: "real-estate",
-      subcategory: listing.category.slug,
-    }),
-  );
-
   return (
-    <main className="container max-w-7xl mx-auto px-4 pt-8">
-      {/* Auto Categories Section */}
-      <CategoryGrid title="Auto Categories" categories={autoCategories} />
-
-      {/* Real Estate Categories Section */}
-      <CategoryGrid
-        title="Real Estate Categories"
-        categories={realEstateCategories}
-      />
+    <div className="container max-w-7xl mx-auto px-4 pt-8">
+      {categories.map((category) => (
+        <SubCategoryGrid
+          key={category.slug}
+          title={category.name}
+          parentSlug={category.slug}
+          categories={category.children}
+        />
+      ))}
 
       {/* Popular Autos Listings Section */}
-      <PopularListingsGrid
+      {/* <PopularListingsGrid
         title="Popular listings in Autos"
         listings={popularAutosListingsWithImages}
-      />
+      /> */}
 
       {/* Popular Real Estate Listings Section */}
-      <PopularListingsGrid
+      {/* <PopularListingsGrid
         title="Popular listings in Real Estate"
         listings={popularRealEstateListingsWithImages}
-      />
-    </main>
+      /> */}
+    </div>
   );
 }

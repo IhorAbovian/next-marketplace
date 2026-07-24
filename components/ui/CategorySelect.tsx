@@ -64,6 +64,7 @@ export default function CategorySelect({
               )}
               {category.name}
             </SelectLabel>
+
             {category.children.map((child) => (
               <SelectItem
                 key={child.slug}
