@@ -1,17 +1,14 @@
-import Link from "next/link";
 import VerticalListingCard, {
-  VerticalListingCardProps,
+  type VerticalListingWithRelations,
 } from "@/components/cards/VerticalListingCard";
-
-export type PopularListingsGridProps = {
-  title: string;
-  listings: VerticalListingCardProps[];
-};
 
 export default function PopularListingsGrid({
   title,
   listings,
-}: PopularListingsGridProps) {
+}: {
+  title: string;
+  listings: VerticalListingWithRelations[];
+}) {
   return (
     <section className="py-8">
       <div className="flex items-center justify-between mb-6">
@@ -20,16 +17,7 @@ export default function PopularListingsGrid({
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {listings.map((listing) => (
-          <VerticalListingCard
-            key={listing.id}
-            id={listing.id}
-            title={listing.title}
-            price={listing.price}
-            image={listing.image}
-            location={listing.location}
-            category={listing.category}
-            subcategory={listing.subcategory}
-          />
+          <VerticalListingCard key={listing.id} listing={listing} />
         ))}
       </div>
     </section>
