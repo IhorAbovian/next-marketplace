@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import ListingPage from "@/components/sections/ListingPage";
 
-export default async function Page({
+export default async function AutoListingDetailPage({
   params,
 }: {
   params: Promise<{ subcategory: string; id: string }>;

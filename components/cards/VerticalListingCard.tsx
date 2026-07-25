@@ -11,6 +11,7 @@ export type VerticalListingWithRelations = Prisma.ListingGetPayload<{
     title: true;
     price: true;
     location: true;
+    description: true;
     images: { take: 1; select: { url: true } };
     category: { select: { slug: true; parent: { select: { slug: true } } } };
   };
@@ -21,7 +22,7 @@ export default function VerticalListingCard({
 }: {
   listing: VerticalListingWithRelations;
 }) {
-  const { id, title, price, images, location, category } = listing;
+  const { id, title, price, images, location, description, category } = listing;
 
   const isSubcategory = category.parent?.slug;
 
@@ -46,6 +47,11 @@ export default function VerticalListingCard({
           </div>
           <h3 className="font-medium text-sm mb-1 truncate">{title}</h3>
           <p className="text-gray-500 text-xs mb-1 truncate">{location}</p>
+          {description && (
+            <p className="text-gray-600 text-xs mb-1 line-clamp-2">
+              {description}
+            </p>
+          )}
           <p className="text-gray-800 font-bold text-sm truncate">
             {formatPrice(price)}
           </p>
