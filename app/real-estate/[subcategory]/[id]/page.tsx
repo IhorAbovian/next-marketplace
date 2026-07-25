@@ -89,7 +89,7 @@ export default async function ListingPage({
           <h1 className="text-2xl font-bold">{listing.title}</h1>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold">${Number(listing.price)}</span>
-            <span className="text-sm text-gray-500">USD</span>
+            <span className="text-sm text-gray-500"></span>
           </div>
           <p className="text-gray-600">{listing.location}</p>
           <Button className="w-full py-3">Contact Seller</Button>

@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import type { Prisma } from "@/generated/prisma/client";
 import { IMAGE_PLACEHOLDER } from "@/lib/constants";
+import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -59,7 +60,7 @@ export default function HorizontalListingCard({
             </div>
 
             <p className="text-lg font-bold text-gray-800 mt-2">
-              ${Number(price)}
+              {formatPrice(price)}
             </p>
           </div>
         </CardContent>

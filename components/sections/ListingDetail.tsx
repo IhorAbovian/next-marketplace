@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/lib/utils";
 
 export default async function ListingPage({
   params,
@@ -86,8 +87,10 @@ export default async function ListingPage({
         <div className="space-y-4">
           <h1 className="text-2xl font-bold">{listing.title}</h1>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold">${Number(listing.price)}</span>
-            <span className="text-sm text-gray-500">USD</span>
+            <span className="text-3xl font-bold">
+              {formatPrice(listing.price)}
+            </span>
+            <span className="text-sm text-gray-500"></span>
           </div>
           <p className="text-gray-600">{listing.location}</p>
           <p className="text-gray-700">{listing.description}</p>

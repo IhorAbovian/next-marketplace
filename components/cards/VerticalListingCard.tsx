@@ -3,6 +3,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { IMAGE_PLACEHOLDER } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
+import { formatPrice } from "@/lib/utils";
 
 export type VerticalListingWithRelations = Prisma.ListingGetPayload<{
   select: {
@@ -46,7 +47,7 @@ export default function VerticalListingCard({
           <h3 className="font-medium text-sm mb-1 truncate">{title}</h3>
           <p className="text-gray-500 text-xs mb-1 truncate">{location}</p>
           <p className="text-gray-800 font-bold text-sm truncate">
-            ${Number(price)}
+            {formatPrice(price)}
           </p>
         </CardContent>
       </Card>
