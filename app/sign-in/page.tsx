@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FaGoogle } from "react-icons/fa";
-
 import { authClient } from "@/lib/auth-client"; //import the auth client
 
 export default function SignInPage() {
@@ -29,6 +28,13 @@ export default function SignInPage() {
   //   // Handle sign in logic
   //   console.log("Sign in data:", formData);
   // };
+
+  const {
+    data: session,
+    isPending, //loading state
+    error, //error object
+    refetch, //refetch the session
+  } = authClient.useSession();
 
   const handleGoogleSignIn = async () => {
     await authClient.signIn.social({

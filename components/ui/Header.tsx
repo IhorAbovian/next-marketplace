@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SearchBar from "@/components/ui/SearchBar";
+import SignOutButton from "@/components/ui/SignOutButton";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -9,8 +10,16 @@ import {
   NavigationMenuTrigger,
 } from "./navigation-menu";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export default async function Header() {
+  const session = await auth.api.getSession({
+    headers: await headers(), // you need to pass the headers object.
+  });
+
+  const isLoggedIn = !!session?.user;
+
   const categories = await prisma.category.findMany({
     where: {
       parentId: null,
@@ -38,17 +47,21 @@ export default async function Header() {
           <SearchBar categories={categories} />
         </div>
 
-        <div className="flex items-center gap-2">
-          <Link href="/sign-up" className="hover:underline">
-            Register
-          </Link>
+        {!isLoggedIn ? (
+          <div className="flex items-center gap-2">
+            <Link href="/sign-up" className="hover:underline">
+              Register
+            </Link>
 
-          <span>or</span>
+            <span>or</span>
 
-          <Link href="/sign-in" className="hover:underline">
-            Sign In
-          </Link>
-        </div>
+            <Link href="/sign-in" className="hover:underline">
+              Sign In
+            </Link>
+          </div>
+        ) : (
+          <SignOutButton />
+        )}
       </div>
 
       <div className="container max-w-7xl mx-auto px-1 py-2">
