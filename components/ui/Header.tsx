@@ -1,6 +1,6 @@
 import Link from "next/link";
 import SearchBar from "@/components/ui/SearchBar";
-import SignOutButton from "@/components/ui/SignOutButton";
+import ProfileMenu from "@/components/ui/ProfileMenu";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -60,7 +60,7 @@ export default async function Header() {
             </Link>
           </div>
         ) : (
-          <SignOutButton />
+          <ProfileMenu userName={session?.user?.name} />
         )}
       </div>
 

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "./lib/auth";
 
-import { headers } from "next/headers";
-
 // 1. Specify protected
 const protectedRoutes = ["/profile"];
 const loginRoutes = ["/sign-in", "/sign-up"];
@@ -14,7 +12,7 @@ export default async function proxy(req: NextRequest) {
   const isLoginRoute = loginRoutes.includes(path);
 
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: req.headers,
   });
 
   // 4. Redirect to /login if the user is not authenticated
