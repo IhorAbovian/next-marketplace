@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
@@ -36,6 +38,16 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   });
 
   const { tab: activeTab = "info" } = await searchParams;
+
+  async function updateProfile(formData: FormData) {
+    "use server";
+    const name = formData.get("name") as string;
+    const phone = formData.get("phone") as string;
+    await prisma.user.update({
+      where: { id: sessionData?.user.id },
+      data: { name, phone },
+    });
+  }
 
   return (
     <div className="container max-w-6xl mx-auto px-4 py-8 ">
@@ -74,6 +86,16 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                   }`}
                 >
                   Favorites
+                </Link>
+                <Link
+                  href="/profile?tab=settings"
+                  className={`block px-4 py-3 rounded text-sm font-medium transition ${
+                    activeTab === "settings"
+                      ? "bg-gray-100 text-gray-900"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  Settings
                 </Link>
               </div>
             </CardContent>
@@ -179,6 +201,37 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                 <p className="text-sm text-gray-400">
                   View your saved listings here
                 </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeTab === "settings" && (
+            <Card>
+              <CardContent className="p-8">
+                <h2 className="text-2xl font-bold mb-6">Settings</h2>
+                <form action={updateProfile} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Name
+                    </label>
+                    <Input
+                      name="name"
+                      defaultValue={user?.name || ""}
+                      placeholder="Name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Phone
+                    </label>
+                    <Input
+                      name="phone"
+                      defaultValue={user?.phone || ""}
+                      placeholder="Phone(optional)"
+                    />
+                  </div>
+                  <Button type="submit">Save Changes</Button>
+                </form>
               </CardContent>
             </Card>
           )}
