@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
@@ -14,16 +13,12 @@ interface ProfilePageProps {
 }
 
 export default async function ProfilePage({ searchParams }: ProfilePageProps) {
-  const session = await auth.api.getSession({
+  const sessionData = await auth.api.getSession({
     headers: await headers(),
   });
 
-  if (!session?.user) {
-    redirect("/sign-in");
-  }
-
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: sessionData?.user.id },
     select: {
       id: true,
       name: true,
@@ -40,14 +35,10 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     },
   });
 
-  if (!user) {
-    redirect("/sign-in");
-  }
-
-  const activeTab = searchParams.tab || "info";
+  const { tab: activeTab = "info" } = await searchParams;
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-8">
+    <div className="container max-w-6xl mx-auto px-4 py-8 ">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Sidebar Menu */}
         <div className="md:col-span-1">
@@ -95,10 +86,10 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
             <Card>
               <CardContent className="p-8">
                 <div className="flex items-start gap-8">
-                  {user.image ? (
+                  {user?.image ? (
                     <Image
                       src={user.image}
-                      alt={user.name || "User"}
+                      alt={user?.name || "User"}
                       width={160}
                       height={160}
                       className="w-40 h-40 rounded-lg object-cover flex-shrink-0"
@@ -111,22 +102,24 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                   )}
 
                   <div className="flex-1">
-                    <h1 className="text-4xl font-bold mb-6">{user.name || "User"}</h1>
+                    <h1 className="text-4xl font-bold mb-6">
+                      {user?.name || "User"}
+                    </h1>
 
                     <div className="space-y-4 mb-8">
                       <div className="border-b border-gray-200 pb-4">
                         <p className="text-xs uppercase text-gray-500 font-semibold mb-1">
                           Email
                         </p>
-                        <p className="text-gray-900">{user.email}</p>
+                        <p className="text-gray-900">{user?.email}</p>
                       </div>
 
-                      {user.phone && (
+                      {user?.phone && (
                         <div className="border-b border-gray-200 pb-4">
                           <p className="text-xs uppercase text-gray-500 font-semibold mb-1">
                             Phone
                           </p>
-                          <p className="text-gray-900">{user.phone}</p>
+                          <p className="text-gray-900">{user?.phone}</p>
                         </div>
                       )}
 
@@ -134,7 +127,9 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                         <p className="text-xs uppercase text-gray-500 font-semibold mb-1">
                           Member Since
                         </p>
-                        <p className="text-gray-900">{formatDate(user.createdAt)}</p>
+                        <p className="text-gray-900">
+                          {user?.createdAt && formatDate(user.createdAt)}
+                        </p>
                       </div>
                     </div>
 
@@ -144,7 +139,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                           Total Listings
                         </p>
                         <p className="text-3xl font-bold text-gray-900">
-                          {user._count.listings}
+                          {user?._count.listings}
                         </p>
                       </div>
                       <div className="bg-gray-50 p-4 rounded">
@@ -152,7 +147,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                           Favorites
                         </p>
                         <p className="text-3xl font-bold text-gray-900">
-                          {user._count.favorites}
+                          {user?._count.favorites}
                         </p>
                       </div>
                     </div>
@@ -165,8 +160,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           {activeTab === "listings" && (
             <Card>
               <CardContent className="p-8 text-center">
-                <p className="text-gray-500 mb-2">You have {user._count.listings} listings</p>
-                <p className="text-sm text-gray-400">Manage your listings here</p>
+                <p className="text-gray-500 mb-2">
+                  You have {user?._count.listings} listings
+                </p>
+                <p className="text-sm text-gray-400">
+                  Manage your listings here
+                </p>
               </CardContent>
             </Card>
           )}
@@ -174,8 +173,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           {activeTab === "favorites" && (
             <Card>
               <CardContent className="p-8 text-center">
-                <p className="text-gray-500 mb-2">You have {user._count.favorites} favorites</p>
-                <p className="text-sm text-gray-400">View your saved listings here</p>
+                <p className="text-gray-500 mb-2">
+                  You have {user?._count.favorites} favorites
+                </p>
+                <p className="text-sm text-gray-400">
+                  View your saved listings here
+                </p>
               </CardContent>
             </Card>
           )}

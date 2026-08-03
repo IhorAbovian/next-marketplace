@@ -47,7 +47,7 @@ export default function SignInPage() {
        * A URL to redirect after the user authenticates with the provider
        * @default "/"
        */
-      callbackURL: "/dashboard",
+      callbackURL: "/",
       /**
        * A URL to redirect if an error occurs during the sign in process
        */
@@ -55,7 +55,7 @@ export default function SignInPage() {
       /**
        * A URL to redirect if the user is newly registered
        */
-      newUserCallbackURL: "/welcome",
+      newUserCallbackURL: "/profile",
     });
   };
 
