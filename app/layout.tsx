@@ -1,6 +1,7 @@
 import "./globals.css";
 import Header from "@/components/ui/Header";
 import Footer from "@/components/ui/Footer";
+import { Toaster } from "@/components/ui/toast";
 
 export const metadata = {
   title: "My Next Marketplace",
@@ -18,6 +19,7 @@ export default async function RootLayout({
         <Header />
 
         <main>{children}</main>
+        <Toaster />
 
         <Footer />
       </body>

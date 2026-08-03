@@ -9,7 +9,6 @@ export default async function ForRentPage() {
       id: true,
       title: true,
       price: true,
-      location: true,
       description: true,
       images: { take: 1, select: { url: true } },
       category: { select: { slug: true, parent: { select: { slug: true } } } },

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 
 interface ProfileSettingsFormProps {
   userId: string;
@@ -33,12 +34,20 @@ export default function ProfileSettingsForm({
 
       if (response.ok) {
         // Success - data saved
-        console.log("Profile updated successfully");
+        toast.add({
+          type: "success",
+          title: "Success",
+          description: "Profile updated successfully",
+        });
       } else {
         throw new Error("Save failed");
       }
     } catch (error) {
-      console.error("Update error:", error);
+      toast.add({
+        type: "error",
+        title: "Error",
+        description: "Failed to update profile",
+      });
     }
   };
 

@@ -17,7 +17,6 @@ export default async function RealEstateListingDetailPage({
       id: true,
       title: true,
       price: true,
-      location: true,
       description: true,
       images: { select: { url: true } },
       category: {

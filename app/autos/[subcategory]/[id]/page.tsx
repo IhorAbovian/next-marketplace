@@ -17,7 +17,7 @@ export default async function AutoListingDetailPage({
       id: true,
       title: true,
       price: true,
-      location: true,
+
       description: true,
       images: { select: { url: true } },
       category: {
