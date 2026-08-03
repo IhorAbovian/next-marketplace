@@ -52,6 +52,12 @@ export default function ProfileMenu({ userName }: ProfileMenuProps) {
               >
                 Favorites
               </Link>
+              <Link
+                href="/profile?tab=settings"
+                className="px-4 py-3 hover:bg-gray-100 rounded text-gray-900 block"
+              >
+                Settings
+              </Link>
               <button
                 onClick={handleSignOut}
                 className="px-4 py-3 hover:bg-gray-100 rounded text-left text-gray-900 w-full cursor-pointer"

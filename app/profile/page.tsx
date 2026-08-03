@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { prisma } from "@/lib/prisma";
+// import { prisma } from "@/lib/prisma";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,23 +19,38 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     headers: await headers(),
   });
 
-  const user = await prisma.user.findUnique({
-    where: { id: sessionData?.user.id },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      image: true,
-      createdAt: true,
-      _count: {
-        select: {
-          listings: true,
-          favorites: true,
+  // const user = await prisma.user.findUnique({
+  //   where: { id: sessionData?.user.id },
+  //   select: {
+  //     id: true,
+  //     name: true,
+  //     email: true,
+  //     phone: true,
+  //     image: true,
+  //     createdAt: true,
+  //     _count: {
+  //       select: {
+  //         listings: true,
+  //         favorites: true,
+  //       },
+  //     },
+  //   },
+  // });
+
+  const user = sessionData?.user
+    ? {
+        id: sessionData.user.id,
+        name: sessionData.user.name,
+        email: sessionData.user.email,
+        phone: (sessionData.user as any).phone || null,
+        image: sessionData.user.image,
+        createdAt: sessionData.user.createdAt,
+        _count: {
+          listings: 0,
+          favorites: 0,
         },
-      },
-    },
-  });
+      }
+    : null;
 
   const { tab: activeTab = "info" } = await searchParams;
 
@@ -43,9 +58,17 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     "use server";
     const name = formData.get("name") as string;
     const phone = formData.get("phone") as string;
-    await prisma.user.update({
-      where: { id: sessionData?.user.id },
-      data: { name, phone },
+
+    // await prisma.user.update({
+    //   where: { id: sessionData?.user.id },
+    //   data: { name, phone },
+    // });
+
+    await auth.api.updateUser({
+      body: {
+        name,
+      },
+      headers: await headers(),
     });
   }
 
