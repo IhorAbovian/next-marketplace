@@ -12,7 +12,7 @@ model User {
   email     String     @unique
   image     String?
   name      String?
-  phone     String?    @unique
+  phone     String?
   favorites Favorite[]
   listings  Listing[]
   createdAt DateTime   @default(now())
@@ -26,15 +26,14 @@ model Listing {
   title       String
   description String?
   price       Decimal
-  location    String
   categoryId  String
   authorId    String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  favorites   Favorite[]
   images      Image[]
   author      User       @relation(fields: [authorId], references: [id])
   category    Category   @relation(fields: [categoryId], references: [id])
+  favorites   Favorite[]
 }
 
 model Image {

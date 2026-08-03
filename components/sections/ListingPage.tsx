@@ -9,7 +9,6 @@ type ListingWithRelations = Prisma.ListingGetPayload<{
     id: true;
     title: true;
     price: true;
-    location: true;
     description: true;
     images: { select: { url: true } };
     category: {
@@ -86,7 +85,6 @@ export default function ListingPage({
               {formatPrice(listing.price)}
             </span>
           </div>
-          <p className="text-gray-600">{listing.location}</p>
           <Button className="w-full py-3">Contact Seller</Button>
 
           <div className="border-t pt-4">

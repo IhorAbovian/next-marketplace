@@ -1,12 +1,14 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-// import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
+import ProfileSettingsForm from "@/components/ProfileSettingsForm";
 
 interface ProfilePageProps {
   searchParams: {
@@ -19,37 +21,25 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     headers: await headers(),
   });
 
-  // const user = await prisma.user.findUnique({
-  //   where: { id: sessionData?.user.id },
-  //   select: {
-  //     id: true,
-  //     name: true,
-  //     email: true,
-  //     phone: true,
-  //     image: true,
-  //     createdAt: true,
-  //     _count: {
-  //       select: {
-  //         listings: true,
-  //         favorites: true,
-  //       },
-  //     },
-  //   },
-  // });
-
+  // Get user data from Prisma using email (since BetterAuth ID differs from Prisma ID)
   const user = sessionData?.user
-    ? {
-        id: sessionData.user.id,
-        name: sessionData.user.name,
-        email: sessionData.user.email,
-        phone: (sessionData.user as any).phone || null,
-        image: sessionData.user.image,
-        createdAt: sessionData.user.createdAt,
-        _count: {
-          listings: 0,
-          favorites: 0,
+    ? await prisma.user.findUnique({
+        where: { email: sessionData.user.email },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          image: true,
+          createdAt: true,
+          _count: {
+            select: {
+              listings: true,
+              favorites: true,
+            },
+          },
         },
-      }
+      })
     : null;
 
   const { tab: activeTab = "info" } = await searchParams;
@@ -59,17 +49,19 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     const name = formData.get("name") as string;
     const phone = formData.get("phone") as string;
 
-    // await prisma.user.update({
-    //   where: { id: sessionData?.user.id },
-    //   data: { name, phone },
-    // });
+    try {
+      // Update user through Prisma using email to find the right record
+      const updatedUser = await prisma.user.update({
+        where: { email: sessionData?.user.email },
+        data: { name, phone },
+      });
+      console.log("Updated user:", updatedUser);
+    } catch (error) {
+      console.error("Update error:", error);
+    }
 
-    await auth.api.updateUser({
-      body: {
-        name,
-      },
-      headers: await headers(),
-    });
+    // Redirect to refresh the page with updated data
+    redirect("/profile?tab=settings");
   }
 
   return (
@@ -232,29 +224,11 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
             <Card>
               <CardContent className="p-8">
                 <h2 className="text-2xl font-bold mb-6">Settings</h2>
-                <form action={updateProfile} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Name
-                    </label>
-                    <Input
-                      name="name"
-                      defaultValue={user?.name || ""}
-                      placeholder="Name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Phone
-                    </label>
-                    <Input
-                      name="phone"
-                      defaultValue={user?.phone || ""}
-                      placeholder="Phone(optional)"
-                    />
-                  </div>
-                  <Button type="submit">Save Changes</Button>
-                </form>
+                <ProfileSettingsForm
+                  userId={user?.id || ""}
+                  initialName={user?.name || ""}
+                  initialPhone={user?.phone || ""}
+                />
               </CardContent>
             </Card>
           )}
