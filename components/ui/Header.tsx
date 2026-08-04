@@ -1,6 +1,7 @@
 import Link from "next/link";
 import SearchBar from "@/components/ui/SearchBar";
 import ProfileMenu from "@/components/ui/ProfileMenu";
+import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -23,6 +24,7 @@ export default async function Header() {
   const categories = await prisma.category.findMany({
     where: {
       parentId: null,
+      name: { not: "General" },
     },
     select: {
       slug: true,
@@ -60,7 +62,12 @@ export default async function Header() {
             </Link>
           </div>
         ) : (
-          <ProfileMenu userName={session?.user?.name} />
+          <div className="flex items-center gap-4">
+            <Link href="/create-listing">
+              <Button>Create Listing</Button>
+            </Link>
+            <ProfileMenu userName={session?.user?.name} />
+          </div>
         )}
       </div>
 

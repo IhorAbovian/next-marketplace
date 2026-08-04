@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 
 export default async function HomePage() {
   const categories = await prisma.category.findMany({
+    where: {
+      name: { not: "General" },
+    },
     select: {
       name: true,
       slug: true,
