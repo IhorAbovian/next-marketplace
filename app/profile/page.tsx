@@ -9,6 +9,7 @@ import Image from "next/image";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import ProfileSettingsForm from "@/components/ProfileSettingsForm";
+import UserListingsGrid from "@/components/UserListingsGrid";
 
 interface ProfilePageProps {
   searchParams: {
@@ -41,6 +42,18 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         },
       })
     : null;
+
+  // Get user's listings if user exists
+  const listings = user
+    ? await prisma.listing.findMany({
+        where: { authorId: user.id },
+        include: {
+          images: true,
+          category: true,
+        },
+        orderBy: { createdAt: "desc" },
+      })
+    : [];
 
   const { tab: activeTab = "info" } = await searchParams;
 
@@ -196,13 +209,9 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
           {activeTab === "listings" && (
             <Card>
-              <CardContent className="p-8 text-center">
-                <p className="text-gray-500 mb-2">
-                  You have {user?._count.listings} listings
-                </p>
-                <p className="text-sm text-gray-400">
-                  Manage your listings here
-                </p>
+              <CardContent className="p-8">
+                <h2 className="text-2xl font-bold mb-6">My Listings</h2>
+                <UserListingsGrid listings={listings} />
               </CardContent>
             </Card>
           )}

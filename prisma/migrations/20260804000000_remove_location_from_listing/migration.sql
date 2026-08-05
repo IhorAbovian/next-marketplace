@@ -1,0 +1,1 @@
+-- This migration is empty because the location column was already removed from the database

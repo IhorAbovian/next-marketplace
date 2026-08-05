@@ -31,25 +31,23 @@ export async function POST(req: NextRequest) {
     const categoryId = formData.get("categoryId") as string;
 
     // Validate required fields
-    if (!title || !price) {
+    if (!title || !price || !categoryId) {
       return NextResponse.json(
-        { error: "Title and price are required" },
+        { error: "Title, price, and category are required" },
         { status: 400 },
       );
     }
 
-    // Get or create default category
-    let category = await prisma.category.findUnique({
-      where: { slug: "general" },
+    // Verify category exists
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
     });
 
     if (!category) {
-      category = await prisma.category.create({
-        data: {
-          name: "General",
-          slug: "general",
-        },
-      });
+      return NextResponse.json(
+        { error: "Category not found" },
+        { status: 404 },
+      );
     }
 
     // Create listing with image
@@ -57,7 +55,7 @@ export async function POST(req: NextRequest) {
       data: {
         title,
         description: description || null,
-        price: parseFloat(price),
+        price: parseInt(price, 10),
         categoryId: category.id,
         authorId: user.id,
         images: imageUrl
@@ -75,7 +73,11 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(listing, { status: 201 });
   } catch (error) {
-    console.error("Create listing error:", error);
-    return NextResponse.json({ error: "Failed to " }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Create listing error:", errorMessage);
+    return NextResponse.json(
+      { error: errorMessage || "Failed to create listing" },
+      { status: 500 },
+    );
   }
 }

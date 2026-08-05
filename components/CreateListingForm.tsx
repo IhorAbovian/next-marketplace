@@ -162,7 +162,8 @@ export default function CreateListingForm({
       });
 
       if (!listingRes.ok) {
-        throw new Error("Failed to create listing");
+        const errorData = await listingRes.json();
+        throw new Error(errorData.error || "Failed to create listing");
       }
 
       toast.add({
@@ -173,11 +174,12 @@ export default function CreateListingForm({
 
       router.push("/");
       router.refresh();
-    } catch {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
       toast.add({
         type: "error",
         title: "Error",
-        description: "Failed to create listing. Please try again.",
+        description: errorMessage,
       });
     } finally {
       setForm((prev) => ({ ...prev, isLoading: false }));

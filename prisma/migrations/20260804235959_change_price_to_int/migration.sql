@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Listing" ALTER COLUMN "price" TYPE INTEGER USING ROUND(price)::INTEGER;

@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  turbopack: {},
   /* config options here */
 };
 
