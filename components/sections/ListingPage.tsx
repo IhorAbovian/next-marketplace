@@ -51,13 +51,17 @@ export default function ListingPage({
         <span className="mx-2">›</span>
         {isSubcategory && (
           <>
-            <Link href={`/${listing.category.parent?.slug}`}>
+            <span className="text-gray-500">
               {listing.category.parent?.name}
-            </Link>
+            </span>
             <span className="mx-2">›</span>
           </>
         )}
-        <Link href={`/${listing.category.slug}`}>{listing.category.name}</Link>
+        <Link
+          href={`/${listing.category.parent?.slug}/${listing.category.slug}`}
+        >
+          {listing.category.name}
+        </Link>
         <span className="mx-2">›</span>
         <span className="text-gray-800">{listing.title}</span>
       </nav>

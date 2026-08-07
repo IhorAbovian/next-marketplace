@@ -49,7 +49,11 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         where: { authorId: user.id },
         include: {
           images: true,
-          category: true,
+          category: {
+            include: {
+              parent: true,
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
       })

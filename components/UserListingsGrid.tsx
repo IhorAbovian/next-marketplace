@@ -11,25 +11,24 @@ interface Listing {
   title: string;
   price: number;
   images: { url: string }[];
-  category: { name: string };
+  category: {
+    name: string;
+    slug: string;
+    parent?: { slug: string } | null;
+  };
 }
 
 interface UserListingsGridProps {
   listings: Listing[];
-  onListingDeleted?: () => void;
 }
 
 export default function UserListingsGrid({
-  listings,
-  onListingDeleted,
+  listings: initialListings,
 }: UserListingsGridProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [listings, setListings] = useState(initialListings);
 
   const handleDelete = async (listingId: string) => {
-    if (!confirm("Are you sure you want to delete this listing?")) {
-      return;
-    }
-
     setDeletingId(listingId);
     try {
       const response = await fetch(`/api/listings/${listingId}`, {
@@ -52,8 +51,8 @@ export default function UserListingsGrid({
         description: "Listing deleted successfully",
       });
 
-      // Reload the page to refresh listings
-      window.location.reload();
+      // Remove the deleted listing from local state
+      setListings((prev) => prev.filter((l) => l.id !== listingId));
     } catch (error) {
       toast.add({
         type: "error",
@@ -78,56 +77,59 @@ export default function UserListingsGrid({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {listings.map((listing) => (
-        <div
-          key={listing.id}
-          className="border rounded-lg overflow-hidden hover:shadow-lg transition"
-        >
-          {/* Image */}
-          {listing.images && listing.images.length > 0 ? (
-            <div className="relative h-48 bg-gray-200">
-              <Image
-                src={listing.images[0].url}
-                alt={listing.title}
-                fill
-                className="object-cover"
-              />
-            </div>
-          ) : (
-            <div className="h-48 bg-gray-200 flex items-center justify-center">
-              <span className="text-gray-400">No image</span>
-            </div>
-          )}
+      {listings.map((listing) => {
+        const detailHref = listing.category.parent
+          ? `/${listing.category.parent.slug}/${listing.category.slug}/${listing.id}`
+          : `/${listing.category.slug}/${listing.id}`;
 
-          {/* Content */}
-          <div className="p-4">
-            <h3 className="font-bold text-lg mb-2 line-clamp-2">
-              {listing.title}
-            </h3>
-            <p className="mb-2">
-              ${listing.price}
-            </p>
-            <p className="text-sm text-gray-600 mb-4">
-              Category: {listing.category?.name || "Unknown"}
-            </p>
-            <div className="flex gap-2">
-              <Link href={`/autos/cars-trucks/${listing.id}`} className="flex-1">
-                <Button variant="outline" className="w-full">
-                  View
-                </Button>
-              </Link>
+        return (
+          <div
+            key={listing.id}
+            className="border rounded-lg overflow-hidden hover:shadow-lg transition"
+          >
+            <Link href={detailHref} className="block">
+              {/* Image */}
+              {listing.images && listing.images.length > 0 ? (
+                <div className="relative h-48 bg-gray-200">
+                  <Image
+                    src={listing.images[0].url}
+                    alt={listing.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="h-48 bg-gray-200 flex items-center justify-center">
+                  <span className="text-gray-400">No image</span>
+                </div>
+              )}
+
+              {/* Content */}
+              <div className="p-4">
+                <h3 className="font-bold text-lg mb-2 line-clamp-2">
+                  {listing.title}
+                </h3>
+                <p className="mb-2">${listing.price}</p>
+                <p className="text-sm text-gray-600 mb-4">
+                  Category: {listing.category?.name || "Unknown"}
+                </p>
+              </div>
+            </Link>
+
+            {/* Delete Button */}
+            <div className="p-4 pt-0">
               <Button
                 variant="destructive"
                 disabled={deletingId === listing.id}
                 onClick={() => handleDelete(listing.id)}
-                className="flex-1"
+                className="w-full"
               >
                 {deletingId === listing.id ? "Deleting..." : "Delete"}
               </Button>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
