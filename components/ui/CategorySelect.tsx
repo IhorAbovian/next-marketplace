@@ -11,8 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Prisma } from "@/generated/prisma/browser";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { FaCar } from "react-icons/fa";
 import { FaHouse } from "react-icons/fa6";
 
@@ -31,21 +29,19 @@ type CategoryWithRelations = Prisma.CategoryGetPayload<{
 
 export default function CategorySelect({
   categories,
+  value,
+  onChange,
 }: {
   categories: CategoryWithRelations[];
+  value?: string;
+  onChange?: (value: string) => void;
 }) {
-  const router = useRouter();
-  const [selected, setSelected] = useState("");
-
-  const handleCategoryChange = (value: string | null) => {
-    setSelected(value || "");
-    if (value) {
-      router.push(value);
-    }
+  const handleCategoryChange = (val: string | null) => {
+    onChange?.(val || "");
   };
 
   return (
-    <Select value={selected} onValueChange={handleCategoryChange}>
+    <Select value={value} onValueChange={handleCategoryChange}>
       <SelectTrigger className="border-none w-48">
         <SelectValue placeholder="All Categories" />
       </SelectTrigger>
@@ -66,10 +62,7 @@ export default function CategorySelect({
             </SelectLabel>
 
             {category.children.map((child) => (
-              <SelectItem
-                key={child.slug}
-                value={`/${category.slug}/${child.slug}`}
-              >
+              <SelectItem key={child.slug} value={child.slug}>
                 {child.name}
               </SelectItem>
             ))}
