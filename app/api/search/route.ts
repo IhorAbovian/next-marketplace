@@ -5,6 +5,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q") || "";
   const category = searchParams.get("category") || "";
+  const sort = searchParams.get("sort") || "newest";
   const limit = parseInt(searchParams.get("limit") || "20");
   const offset = parseInt(searchParams.get("offset") || "0");
 
@@ -24,6 +25,11 @@ export async function GET(request: NextRequest) {
       };
     }
 
+    const orderBy: any = {};
+    if (sort === "price-asc") orderBy.price = "asc";
+    else if (sort === "price-desc") orderBy.price = "desc";
+    else orderBy.createdAt = "desc";
+
     const [listings, total] = await Promise.all([
       prisma.listing.findMany({
         where,
@@ -37,9 +43,7 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: {
-          createdAt: "desc",
-        },
+        orderBy,
       }),
       prisma.listing.count({ where }),
     ]);

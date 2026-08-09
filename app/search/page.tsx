@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
 import { headers } from "next/headers";
+import SortDropdown from "@/components/SortDropdown";
 
 interface Listing {
   id: string;
@@ -19,13 +20,16 @@ interface Listing {
 async function SearchResults({
   query,
   category,
+  sort,
 }: {
   query: string;
   category: string;
+  sort: string;
 }) {
   const params = new URLSearchParams();
   if (query) params.set("q", query);
   if (category) params.set("category", category);
+  if (sort) params.set("sort", sort);
 
   const headersList = await headers();
   const protocol = headersList.get("x-forwarded-proto") || "http";
@@ -85,16 +89,19 @@ async function SearchResults({
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; sort?: string }>;
 }) {
-  const { q = "", category = "" } = await searchParams;
+  const { q = "", category = "", sort = "newest" } = await searchParams;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Search Listings</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Search Listings</h1>
+        <SortDropdown currentSort={sort} />
+      </div>
 
-      <Suspense key={q + category} fallback={<div>Loading...</div>}>
-        <SearchResults query={q} category={category} />
+      <Suspense key={q + category + sort} fallback={<div>Loading...</div>}>
+        <SearchResults query={q} category={category} sort={sort} />
       </Suspense>
     </div>
   );
