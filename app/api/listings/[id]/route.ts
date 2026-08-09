@@ -5,9 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     const sessionData = await auth.api.getSession({
       headers: await headers(),
     });
@@ -27,7 +29,7 @@ export async function DELETE(
 
     // Get the listing to verify ownership
     const listing = await prisma.listing.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { authorId: true },
     });
 
@@ -42,16 +44,21 @@ export async function DELETE(
       );
     }
 
-    // Delete the listing and related images
+    // First delete all related images, then delete the listing
+    await prisma.image.deleteMany({
+      where: { listingId: id },
+    });
+
     await prisma.listing.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete listing error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to delete listing" },
+      { error: `Failed to delete listing: ${errorMessage}` },
       { status: 500 }
     );
   }

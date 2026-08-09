@@ -14,12 +14,20 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-export default async function Header() {
+export default async function Header({
+  searchParams,
+}: {
+  searchParams?: Promise<{ q?: string; category?: string }>;
+}) {
   const session = await auth.api.getSession({
     headers: await headers(), // you need to pass the headers object.
   });
 
   const isLoggedIn = !!session?.user;
+
+  const params = await searchParams;
+  const query = params?.q || "";
+  const category = params?.category || "";
 
   const categories = await prisma.category.findMany({
     where: {
@@ -46,7 +54,12 @@ export default async function Header() {
         </Link>
 
         <div className="flex-1">
-          <SearchBar categories={categories} />
+          <SearchBar 
+            key={`${query}-${category}`}
+            categories={categories} 
+            initialValue={query} 
+            initialCategory={category} 
+          />
         </div>
 
         {!isLoggedIn ? (

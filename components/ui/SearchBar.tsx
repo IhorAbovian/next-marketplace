@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CategorySelect from "./CategorySelect";
 import type { Prisma } from "@/generated/prisma/browser";
 
@@ -28,8 +28,9 @@ export default function SearchBar({
   initialCategory?: string;
 }) {
   const router = useRouter();
-  const [query, setQuery] = useState(initialValue);
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  // Use initialValue directly as default, and key prop ensures re-mount
+  const [query, setQuery] = useState(() => initialValue || "");
+  const [selectedCategory, setSelectedCategory] = useState(() => initialCategory || "");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
