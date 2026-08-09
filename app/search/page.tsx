@@ -93,9 +93,19 @@ async function SearchResults({
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string; sort?: string; page?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    category?: string;
+    sort?: string;
+    page?: string;
+  }>;
 }) {
-  const { q = "", category = "", sort = "newest", page = "1" } = await searchParams;
+  const {
+    q = "",
+    category = "",
+    sort = "newest",
+    page = "1",
+  } = await searchParams;
   const currentPage = Number(page) || 1;
 
   // Fetch total pages from API
@@ -109,9 +119,12 @@ export default async function SearchPage({
   if (category) params.set("category", category);
   if (sort) params.set("sort", sort);
 
-  const res = await fetch(`${baseUrl}/api/search?${params.toString()}&page=1&limit=20`, {
-    next: { tags: ["search"] },
-  });
+  const res = await fetch(
+    `${baseUrl}/api/search?${params.toString()}&page=1&limit=20`,
+    {
+      next: { tags: ["search"] },
+    },
+  );
   const data = await res.json();
   const totalPages = data.totalPages || 1;
 
@@ -122,8 +135,16 @@ export default async function SearchPage({
         <SortDropdown currentSort={sort} />
       </div>
 
-      <Suspense key={q + category + sort + currentPage} fallback={<div>Loading...</div>}>
-        <SearchResults query={q} category={category} sort={sort} page={currentPage} />
+      <Suspense
+        key={q + category + sort + currentPage}
+        fallback={<div>Loading...</div>}
+      >
+        <SearchResults
+          query={q}
+          category={category}
+          sort={sort}
+          page={currentPage}
+        />
       </Suspense>
 
       <Pagination totalPages={totalPages} />

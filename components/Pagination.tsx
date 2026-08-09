@@ -24,21 +24,21 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
   const getPageNumbers = () => {
     const pages = [];
     const maxVisible = 5;
-    
+
     if (totalPages <= maxVisible) {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
       pages.push(1);
       if (currentPage > 3) pages.push(-1); // ellipsis
-      
+
       const start = Math.max(2, currentPage - 1);
       const end = Math.min(totalPages - 1, currentPage + 1);
       for (let i = start; i <= end; i++) pages.push(i);
-      
+
       if (currentPage < totalPages - 2) pages.push(-1); // ellipsis
       pages.push(totalPages);
     }
-    
+
     return pages;
   };
 
@@ -64,14 +64,12 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
             key={page}
             onClick={() => goToPage(page)}
             className={`px-3 py-1 rounded border ${
-              currentPage === page
-                ? "bg-black text-white"
-                : "hover:bg-gray-100"
+              currentPage === page ? "bg-black text-white" : "hover:bg-gray-100"
             }`}
           >
             {page}
           </button>
-        )
+        ),
       )}
 
       <button
