@@ -19,8 +19,7 @@ export default function SignUpPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle registration logic
-    console.log("Registration data:", formData);
+
   };
 
   return (

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Trash2Icon } from "lucide-react";
+import { Trash2Icon, Heart } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 
@@ -34,13 +34,53 @@ interface Listing {
 
 interface UserListingsGridProps {
   listings: Listing[];
+  isFavoritesView?: boolean;
 }
 
 export default function UserListingsGrid({
   listings: initialListings,
+  isFavoritesView = false,
 }: UserListingsGridProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [listings, setListings] = useState(initialListings);
+
+  const handleRemoveFromFavorites = async (listingId: string) => {
+    setDeletingId(listingId);
+    try {
+      const response = await fetch(`/api/favorites/${listingId}`, {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Remove favorite error:", error);
+        toast.add({
+          type: "error",
+          title: "Error",
+          description: error.error || "Failed to remove from favorites",
+        });
+        return;
+      }
+
+      toast.add({
+        type: "success",
+        title: "Success",
+        description: "Removed from favorites",
+      });
+
+      setListings((prev) => {
+        return prev.filter((l) => l.id !== listingId);
+      });
+    } catch (error) {
+      toast.add({
+        type: "error",
+        title: "Error",
+        description: "Failed to remove from favorites",
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const handleDelete = async (listingId: string) => {
     setDeletingId(listingId);
@@ -48,8 +88,6 @@ export default function UserListingsGrid({
       const response = await fetch(`/api/listings/${listingId}`, {
         method: "DELETE",
       });
-
-      console.log("Delete response status:", response.status, response.ok);
 
       if (!response.ok) {
         const error = await response.json();
@@ -63,7 +101,6 @@ export default function UserListingsGrid({
       }
 
       const data = await response.json();
-      console.log("Delete success:", data);
 
       toast.add({
         type: "success",
@@ -72,14 +109,13 @@ export default function UserListingsGrid({
       });
 
       // Remove the deleted listing from local state
-      console.log("Before filter:", listings.length);
+
       setListings((prev) => {
         const filtered = prev.filter((l) => l.id !== listingId);
-        console.log("After filter:", filtered.length);
+
         return filtered;
       });
     } catch (error) {
-      console.error("Delete catch error:", error);
       toast.add({
         type: "error",
         title: "Error",
@@ -145,42 +181,56 @@ export default function UserListingsGrid({
               </div>
             </Link>
 
-            {/* Delete Button */}
+            {/* Action Buttons */}
             <div className="p-4 pt-0">
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="destructive"
-                    disabled={deletingId === listing.id}
-                    className="w-full"
-                  >
-                    {deletingId === listing.id ? "Deleting..." : "Delete"}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent size="sm">
-                  <AlertDialogHeader>
-                    <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
-                      <Trash2Icon />
-                    </AlertDialogMedia>
-                    <AlertDialogTitle>Delete listing?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      listing.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel variant="outline">
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
+              {isFavoritesView ? (
+                <Button
+                  variant="outline"
+                  disabled={deletingId === listing.id}
+                  className="w-full"
+                  onClick={() => handleRemoveFromFavorites(listing.id)}
+                >
+                  <Heart className="w-4 h-4 mr-2" />
+                  {deletingId === listing.id
+                    ? "Removing..."
+                    : "Remove from Favorites"}
+                </Button>
+              ) : (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
                       variant="destructive"
-                      onClick={() => handleDelete(listing.id)}
+                      disabled={deletingId === listing.id}
+                      className="w-full"
                     >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                      {deletingId === listing.id ? "Deleting..." : "Delete"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent size="sm">
+                    <AlertDialogHeader>
+                      <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                        <Trash2Icon />
+                      </AlertDialogMedia>
+                      <AlertDialogTitle>Delete listing?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete listing.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel variant="outline">
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        variant="destructive"
+                        onClick={() => handleDelete(listing.id)}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </div>
           </div>
         );

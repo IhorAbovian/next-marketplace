@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { formatPrice, formatDate } from "@/lib/utils";
+import FavoriteButton from "@/components/FavoriteButton";
 
 type ListingWithRelations = Prisma.ListingGetPayload<{
   select: {
@@ -90,6 +91,8 @@ export default function ListingPage({
             </span>
           </div>
           <Button className="w-full py-3">Contact Seller</Button>
+
+          <FavoriteButton listingId={listing.id} className="w-full py-3" />
 
           <div className="border-t pt-4">
             <h3 className="font-semibold mb-2">Seller Information</h3>

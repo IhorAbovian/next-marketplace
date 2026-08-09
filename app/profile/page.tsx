@@ -3,8 +3,6 @@ import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
@@ -59,6 +57,28 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       })
     : [];
 
+  // Get user's favorites if user exists
+  const favorites = user
+    ? await prisma.favorite.findMany({
+        where: { userId: user.id },
+        include: {
+          listing: {
+            include: {
+              images: true,
+              category: {
+                include: {
+                  parent: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      })
+    : [];
+
+  const favoriteListings = favorites.map((fav) => fav.listing);
+
   const { tab: activeTab = "info" } = await searchParams;
 
   async function updateProfile(formData: FormData) {
@@ -72,10 +92,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         where: { email: sessionData?.user.email },
         data: { name, phone },
       });
-      console.log("Updated user:", updatedUser);
-    } catch (error) {
-      console.error("Update error:", error);
-    }
+    } catch (error) {}
 
     // Redirect to refresh the page with updated data
     redirect("/profile?tab=settings");
@@ -222,13 +239,21 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
           {activeTab === "favorites" && (
             <Card>
-              <CardContent className="p-8 text-center">
-                <p className="text-gray-500 mb-2">
-                  You have {user?._count.favorites} favorites
-                </p>
-                <p className="text-sm text-gray-400">
-                  View your saved listings here
-                </p>
+              <CardContent className="p-8">
+                <h2 className="text-2xl font-bold mb-6">My Favorites</h2>
+                {favoriteListings.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500 mb-2">No favorites yet</p>
+                    <p className="text-sm text-gray-400">
+                      Start adding listings to your favorites
+                    </p>
+                  </div>
+                ) : (
+                  <UserListingsGrid
+                    listings={favoriteListings}
+                    isFavoritesView={true}
+                  />
+                )}
               </CardContent>
             </Card>
           )}

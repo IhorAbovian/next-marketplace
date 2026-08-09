@@ -4,6 +4,7 @@ import { IMAGE_PLACEHOLDER } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import FavoriteButtonCompact from "@/components/FavoriteButtonCompact";
 
 export type VerticalListingWithRelations = Prisma.ListingGetPayload<{
   select: {
@@ -43,6 +44,9 @@ export default function VerticalListingCard({
               className="object-cover rounded"
               unoptimized
             />
+            <div className="absolute top-2 right-2">
+              <FavoriteButtonCompact listingId={id} />
+            </div>
           </div>
           <h3 className="font-medium text-sm mb-1 truncate">{title}</h3>
           {description && (

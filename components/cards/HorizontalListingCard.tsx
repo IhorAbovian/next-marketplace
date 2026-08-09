@@ -4,6 +4,7 @@ import { IMAGE_PLACEHOLDER } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import FavoriteButtonCompact from "@/components/FavoriteButtonCompact";
 
 export type ListingWithRelations = Prisma.ListingGetPayload<{
   select: {
@@ -43,6 +44,9 @@ export default function HorizontalListingCard({
               className="object-cover rounded"
               unoptimized
             />
+            <div className="absolute top-2 right-2">
+              <FavoriteButtonCompact listingId={id} />
+            </div>
           </div>
 
           <div className="flex-1 flex flex-col justify-between">
