@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { headers } from "next/headers";
 import SortDropdown from "@/components/SortDropdown";
+import Pagination from "@/components/Pagination";
 
 interface Listing {
   id: string;
@@ -21,15 +22,18 @@ async function SearchResults({
   query,
   category,
   sort,
+  page,
 }: {
   query: string;
   category: string;
   sort: string;
+  page: number;
 }) {
   const params = new URLSearchParams();
   if (query) params.set("q", query);
   if (category) params.set("category", category);
   if (sort) params.set("sort", sort);
+  params.set("page", page.toString());
 
   const headersList = await headers();
   const protocol = headersList.get("x-forwarded-proto") || "http";
@@ -89,9 +93,27 @@ async function SearchResults({
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string; sort?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; sort?: string; page?: string }>;
 }) {
-  const { q = "", category = "", sort = "newest" } = await searchParams;
+  const { q = "", category = "", sort = "newest", page = "1" } = await searchParams;
+  const currentPage = Number(page) || 1;
+
+  // Fetch total pages from API
+  const headersList = await headers();
+  const protocol = headersList.get("x-forwarded-proto") || "http";
+  const host = headersList.get("host") || "localhost:3000";
+  const baseUrl = `${protocol}://${host}`;
+
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (category) params.set("category", category);
+  if (sort) params.set("sort", sort);
+
+  const res = await fetch(`${baseUrl}/api/search?${params.toString()}&page=1&limit=20`, {
+    next: { tags: ["search"] },
+  });
+  const data = await res.json();
+  const totalPages = data.totalPages || 1;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -100,9 +122,11 @@ export default async function SearchPage({
         <SortDropdown currentSort={sort} />
       </div>
 
-      <Suspense key={q + category + sort} fallback={<div>Loading...</div>}>
-        <SearchResults query={q} category={category} sort={sort} />
+      <Suspense key={q + category + sort + currentPage} fallback={<div>Loading...</div>}>
+        <SearchResults query={q} category={category} sort={sort} page={currentPage} />
       </Suspense>
+
+      <Pagination totalPages={totalPages} />
     </div>
   );
 }
