@@ -35,8 +35,11 @@ export default function UserListingsGrid({
         method: "DELETE",
       });
 
+      console.log("Delete response status:", response.status, response.ok);
+
       if (!response.ok) {
         const error = await response.json();
+        console.error("Delete error:", error);
         toast.add({
           type: "error",
           title: "Error",
@@ -45,6 +48,9 @@ export default function UserListingsGrid({
         return;
       }
 
+      const data = await response.json();
+      console.log("Delete success:", data);
+
       toast.add({
         type: "success",
         title: "Success",
@@ -52,8 +58,14 @@ export default function UserListingsGrid({
       });
 
       // Remove the deleted listing from local state
-      setListings((prev) => prev.filter((l) => l.id !== listingId));
+      console.log("Before filter:", listings.length);
+      setListings((prev) => {
+        const filtered = prev.filter((l) => l.id !== listingId);
+        console.log("After filter:", filtered.length);
+        return filtered;
+      });
     } catch (error) {
+      console.error("Delete catch error:", error);
       toast.add({
         type: "error",
         title: "Error",
@@ -76,7 +88,10 @@ export default function UserListingsGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      key={listings.length}
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    >
       {listings.map((listing) => {
         const detailHref = listing.category.parent
           ? `/${listing.category.parent.slug}/${listing.category.slug}/${listing.id}`

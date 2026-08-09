@@ -172,7 +172,7 @@ export default function CreateListingForm({
         description: "Listing created successfully",
       });
 
-      router.push("/");
+      router.push("/profile?tab=listings");
       router.refresh();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";

@@ -30,7 +30,9 @@ export default function SearchBar({
   const router = useRouter();
   // Use initialValue directly as default, and key prop ensures re-mount
   const [query, setQuery] = useState(() => initialValue || "");
-  const [selectedCategory, setSelectedCategory] = useState(() => initialCategory || "");
+  const [selectedCategory, setSelectedCategory] = useState(
+    () => initialCategory || "",
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

@@ -54,11 +54,11 @@ export default async function Header({
         </Link>
 
         <div className="flex-1">
-          <SearchBar 
+          <SearchBar
             key={`${query}-${category}`}
-            categories={categories} 
-            initialValue={query} 
-            initialCategory={category} 
+            categories={categories}
+            initialValue={query}
+            initialCategory={category}
           />
         </div>
 

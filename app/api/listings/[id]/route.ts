@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
-    
+
     const sessionData = await auth.api.getSession({
       headers: await headers(),
     });
@@ -40,7 +40,7 @@ export async function DELETE(
     if (listing.authorId !== user.id) {
       return NextResponse.json(
         { error: "Unauthorized - not your listing" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -56,10 +56,11 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete listing error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       { error: `Failed to delete listing: ${errorMessage}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
