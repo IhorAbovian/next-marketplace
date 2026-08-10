@@ -3,63 +3,115 @@ import PopularListingsGrid from "@/components/sections/PopularListingsGrid";
 import { prisma } from "@/lib/prisma";
 
 export default async function HomePage() {
-  const categories = await prisma.category.findMany({
-    where: {
-      name: { not: "General" },
-    },
-    select: {
-      name: true,
-      slug: true,
-      children: { select: { name: true, slug: true } },
-    },
-  });
+  try {
+    const categories = await prisma.category.findMany({
+      where: {
+        parentId: null,
+        name: { not: "General" },
+      },
+      select: {
+        name: true,
+        slug: true,
+        children: { select: { name: true, slug: true } },
+      },
+    });
 
-  const popularAutosListings = await prisma.listing.findMany({
-    where: { category: { slug: "autos" } },
-    take: 5,
-    select: {
-      id: true,
-      title: true,
-      price: true,
-      images: { take: 1, select: { url: true } },
-      category: { select: { slug: true } },
-    },
-  });
+    // Get popular autos listings
+    const autos = await prisma.category.findUnique({
+      where: { slug: "autos" },
+      select: { id: true },
+    });
 
-  const popularRealEstateListings = await prisma.listing.findMany({
-    where: { category: { slug: "real-estate" } },
-    take: 5,
-    select: {
-      id: true,
-      title: true,
-      price: true,
-      images: { take: 1, select: { url: true } },
-      category: { select: { slug: true } },
-    },
-  });
+    const popularAutosListings = autos
+      ? await prisma.listing.findMany({
+          where: {
+            category: {
+              OR: [{ id: autos.id }, { parentId: autos.id }],
+            },
+          },
+          take: 10,
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            description: true,
+            images: { take: 1, select: { url: true } },
+            category: {
+              select: {
+                slug: true,
+                parent: { select: { slug: true } },
+              },
+            },
+          },
+        })
+      : [];
 
-  return (
-    <div className="container max-w-7xl mx-auto px-4 pt-8">
-      {categories.map((category) => (
-        <SubCategoryGrid
-          key={category.slug}
-          title={category.name}
-          parentSlug={category.slug}
-          categories={category.children}
-        />
-      ))}
+    // Get popular real estate listings
+    const realEstate = await prisma.category.findUnique({
+      where: { slug: "real-estate" },
+      select: { id: true },
+    });
 
-      {/* Popular Autos Listings Section */}
-      {/* <PopularListingsGrid
-        title="Popular listings in Autos"
-        listings={popularAutosListingsWithImages}
-      /> */}
+    const popularRealEstateListings = realEstate
+      ? await prisma.listing.findMany({
+          where: {
+            category: {
+              OR: [{ id: realEstate.id }, { parentId: realEstate.id }],
+            },
+          },
+          take: 10,
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            description: true,
+            images: { take: 1, select: { url: true } },
+            category: {
+              select: {
+                slug: true,
+                parent: { select: { slug: true } },
+              },
+            },
+          },
+        })
+      : [];
 
-      {/* Popular Real Estate Listings Section */}
-      {/* <PopularListingsGrid
-        title="Popular listings in Real Estate"
-        listings={popularRealEstateListingsWithImages}
-      /> */}
-    </div>
-  );
+    return (
+      <div className="container max-w-7xl mx-auto px-4 pt-8">
+        {/* Categories Section */}
+        {categories.map((category) => (
+          <SubCategoryGrid
+            key={category.slug}
+            title={category.name}
+            parentSlug={category.slug}
+            categories={category.children}
+          />
+        ))}
+
+        {/* Popular Listings Sections */}
+        {popularAutosListings.length > 0 && (
+          <PopularListingsGrid
+            title="Popular listings in Autos"
+            listings={popularAutosListings}
+          />
+        )}
+
+        {popularRealEstateListings.length > 0 && (
+          <PopularListingsGrid
+            title="Popular listings in Real Estate"
+            listings={popularRealEstateListings}
+          />
+        )}
+      </div>
+    );
+  } catch (error) {
+    console.error("Error loading homepage:", error);
+    return (
+      <div className="container max-w-7xl mx-auto px-4 pt-8">
+        <p className="text-red-600">Failed to load page. Please try again later.</p>
+      </div>
+    );
+  }
 }
