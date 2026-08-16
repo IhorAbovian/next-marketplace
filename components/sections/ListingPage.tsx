@@ -20,13 +20,16 @@ type ListingWithRelations = Prisma.ListingGetPayload<{
       };
     };
     author: { select: { name: true; image: true; createdAt: true } };
+    authorId: true;
   };
 }>;
 
 export default function ListingPage({
   listing,
+  currentUserId,
 }: {
   listing: ListingWithRelations;
+  currentUserId: string | null;
 }) {
   if (!listing) {
     return (
@@ -90,7 +93,9 @@ export default function ListingPage({
               {formatPrice(listing.price)}
             </span>
           </div>
-          <Button className="w-full py-3">Contact Seller</Button>
+          {currentUserId !== listing.authorId && (
+            <Button className="w-full py-3">Contact Seller</Button>
+          )}
 
           <FavoriteButton listingId={listing.id} className="w-full py-3" />
 

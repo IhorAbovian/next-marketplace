@@ -118,14 +118,8 @@ export default function SignInPage() {
 
         <div className="text-center text-sm">
           <span className="text-muted-foreground">
-            Do not have an account?{" "}
+            No account? Just sign in with Google - we'll create one for you!
           </span>
-          <Link
-            href="/sign-up"
-            className="font-medium text-foreground hover:underline"
-          >
-            Register
-          </Link>
         </div>
       </div>
     </div>

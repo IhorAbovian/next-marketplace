@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Trash2Icon, Heart } from "lucide-react";
+import { Trash2Icon, Heart, EditIcon } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 
@@ -196,40 +196,48 @@ export default function UserListingsGrid({
                     : "Remove from Favorites"}
                 </Button>
               ) : (
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      disabled={deletingId === listing.id}
-                      className="w-full"
-                    >
-                      {deletingId === listing.id ? "Deleting..." : "Delete"}
+                <div className="flex gap-2">
+                  <Link href={`/edit-listing/${listing.id}`} className="flex-1">
+                    <Button variant="outline" className="w-full">
+                      <EditIcon className="w-4 h-4 mr-2" />
+                      Edit
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent size="sm">
-                    <AlertDialogHeader>
-                      <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
-                        <Trash2Icon />
-                      </AlertDialogMedia>
-                      <AlertDialogTitle>Delete listing?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete listing.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel variant="outline">
-                        Cancel
-                      </AlertDialogCancel>
-                      <AlertDialogAction
+                  </Link>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
                         variant="destructive"
-                        onClick={() => handleDelete(listing.id)}
+                        disabled={deletingId === listing.id}
+                        className="flex-1"
                       >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                        {deletingId === listing.id ? "Deleting..." : "Delete"}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent size="sm">
+                      <AlertDialogHeader>
+                        <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                          <Trash2Icon />
+                        </AlertDialogMedia>
+                        <AlertDialogTitle>Delete listing?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete listing.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel variant="outline">
+                          Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          variant="destructive"
+                          onClick={() => handleDelete(listing.id)}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               )}
             </div>
           </div>

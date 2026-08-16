@@ -64,12 +64,6 @@ export default async function Header({
 
         {!isLoggedIn ? (
           <div className="flex items-center gap-2">
-            <Link href="/sign-up" className="hover:underline">
-              Register
-            </Link>
-
-            <span>or</span>
-
             <Link href="/sign-in" className="hover:underline">
               Sign In
             </Link>

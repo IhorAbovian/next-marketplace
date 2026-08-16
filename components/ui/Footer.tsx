@@ -81,14 +81,6 @@ export default function Footer() {
                   Sign In
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/sign-up"
-                  className="text-gray-300 hover:text-white"
-                >
-                  Register
-                </Link>
-              </li>
             </ul>
           </div>
 

@@ -3,8 +3,12 @@ import PopularListingsGrid from "@/components/sections/PopularListingsGrid";
 import { prisma } from "@/lib/prisma";
 
 export default async function HomePage() {
+  let categories: any[] = [];
+  let popularAutosListings: any[] = [];
+  let popularRealEstateListings: any[] = [];
+
   try {
-    const categories = await prisma.category.findMany({
+    categories = await prisma.category.findMany({
       where: {
         parentId: null,
         name: { not: "General" },
@@ -22,12 +26,13 @@ export default async function HomePage() {
       select: { id: true },
     });
 
-    const popularAutosListings = autos
+    popularAutosListings = autos
       ? await prisma.listing.findMany({
           where: {
-            category: {
-              OR: [{ id: autos.id }, { parentId: autos.id }],
-            },
+            OR: [
+              { categoryId: autos.id },
+              { category: { parentId: autos.id } },
+            ],
           },
           take: 10,
           orderBy: { createdAt: "desc" },
@@ -53,12 +58,13 @@ export default async function HomePage() {
       select: { id: true },
     });
 
-    const popularRealEstateListings = realEstate
+    popularRealEstateListings = realEstate
       ? await prisma.listing.findMany({
           where: {
-            category: {
-              OR: [{ id: realEstate.id }, { parentId: realEstate.id }],
-            },
+            OR: [
+              { categoryId: realEstate.id },
+              { category: { parentId: realEstate.id } },
+            ],
           },
           take: 10,
           orderBy: { createdAt: "desc" },
@@ -77,41 +83,42 @@ export default async function HomePage() {
           },
         })
       : [];
-
-    return (
-      <div className="container max-w-7xl mx-auto px-4 pt-8">
-        {/* Categories Section */}
-        {categories.map((category) => (
-          <SubCategoryGrid
-            key={category.slug}
-            title={category.name}
-            parentSlug={category.slug}
-            categories={category.children}
-          />
-        ))}
-
-        {/* Popular Listings Sections */}
-        {popularAutosListings.length > 0 && (
-          <PopularListingsGrid
-            title="Popular listings in Autos"
-            listings={popularAutosListings}
-          />
-        )}
-
-        {popularRealEstateListings.length > 0 && (
-          <PopularListingsGrid
-            title="Popular listings in Real Estate"
-            listings={popularRealEstateListings}
-          />
-        )}
-      </div>
-    );
   } catch (error) {
-    console.error("Error loading homepage:", error);
     return (
       <div className="container max-w-7xl mx-auto px-4 pt-8">
-        <p className="text-red-600">Failed to load page. Please try again later.</p>
+        <p className="text-red-600">
+          Failed to load page. Please try again later.
+        </p>
       </div>
     );
   }
+
+  return (
+    <div className="container max-w-7xl mx-auto px-4 pt-8">
+      {/* Categories Section */}
+      {categories.map((category) => (
+        <SubCategoryGrid
+          key={category.slug}
+          title={category.name}
+          parentSlug={category.slug}
+          categories={category.children}
+        />
+      ))}
+
+      {/* Popular Listings Sections */}
+      {popularAutosListings.length > 0 && (
+        <PopularListingsGrid
+          title="Popular listings in Autos"
+          listings={popularAutosListings}
+        />
+      )}
+
+      {popularRealEstateListings.length > 0 && (
+        <PopularListingsGrid
+          title="Popular listings in Real Estate"
+          listings={popularRealEstateListings}
+        />
+      )}
+    </div>
+  );
 }
