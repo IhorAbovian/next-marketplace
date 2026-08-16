@@ -266,6 +266,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
                   userId={user?.id || ""}
                   initialName={user?.name || ""}
                   initialPhone={user?.phone || ""}
+                  initialAvatar={user?.image || null}
                 />
               </CardContent>
             </Card>
