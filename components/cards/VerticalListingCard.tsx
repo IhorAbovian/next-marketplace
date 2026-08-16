@@ -34,8 +34,8 @@ export default function VerticalListingCard({
 
   return (
     <Link href={href}>
-      <Card className="w-full hover:shadow-md transition-shadow">
-        <CardContent className="p-2">
+      <Card className="w-full h-full hover:shadow-md transition-shadow">
+        <CardContent className="p-2 flex flex-col h-full">
           <div className="relative h-36 mb-2">
             <Image
               src={mainImageSrc}
@@ -49,12 +49,10 @@ export default function VerticalListingCard({
             </div>
           </div>
           <h3 className="font-medium text-sm mb-1 truncate">{title}</h3>
-          {description && (
-            <p className="text-gray-600 text-xs mb-1 line-clamp-2">
-              {description}
-            </p>
-          )}
-          <p className="text-gray-800 font-bold text-sm truncate">
+          <p className="text-gray-600 text-xs mb-1 line-clamp-2 min-h-[32px]">
+            {description || " "}
+          </p>
+          <p className="text-gray-800 font-bold text-sm truncate mt-auto">
             {formatPrice(price)}
           </p>
         </CardContent>

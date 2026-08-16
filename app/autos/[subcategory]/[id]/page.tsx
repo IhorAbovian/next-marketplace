@@ -43,7 +43,10 @@ export default async function AutoListingDetailPage({
   });
 
   console.log("DEBUG: listing.authorId =", listing.authorId);
-  console.log("DEBUG: Match? currentUserId === listing.authorId?", currentUserId === listing.authorId);
+  console.log(
+    "DEBUG: Match? currentUserId === listing.authorId?",
+    currentUserId === listing.authorId,
+  );
 
   if (!listing) return <div>Not found</div>;
 

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 interface ProfileSettingsFormProps {
   userId: string;
@@ -64,11 +66,12 @@ export default function ProfileSettingsForm({
       </div>
       <div>
         <label className="block text-sm font-medium mb-2">Phone</label>
-        <Input
+        <PhoneInput
           name="phone"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={setPhone}
           placeholder="Phone (optional)"
+          defaultCountry="CA"
         />
       </div>
       <Button type="submit">Save Changes</Button>

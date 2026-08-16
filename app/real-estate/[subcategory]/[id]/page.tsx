@@ -44,7 +44,10 @@ export default async function RealEstateListingDetailPage({
   if (!listing) return <div>Not found</div>;
 
   console.log("DEBUG: listing.authorId =", listing.authorId);
-  console.log("DEBUG: Match? currentUserId === listing.authorId?", currentUserId === listing.authorId);
+  console.log(
+    "DEBUG: Match? currentUserId === listing.authorId?",
+    currentUserId === listing.authorId,
+  );
 
   return <ListingPage listing={listing} currentUserId={currentUserId} />;
 }

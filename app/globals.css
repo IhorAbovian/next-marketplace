@@ -4,6 +4,26 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.PhoneInput {
+  @apply h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none;
+}
+
+.PhoneInputInput {
+  @apply h-8 w-full min-w-0 rounded-lg border-0 border-transparent bg-transparent px-0 py-0 text-base outline-none focus:outline-none;
+}
+
+.PhoneInputCountrySelect {
+  @apply h-full border-r border-input bg-transparent;
+}
+
+.PhoneInputCountryFlag {
+  @apply rounded-sm;
+}
+
+.PhoneInputCountrySelectArrow {
+  @apply text-gray-500;
+}
+
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: var(--font-sans);
