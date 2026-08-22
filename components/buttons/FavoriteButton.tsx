@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
+import { authClient } from "@/lib/auth-client";
 
 interface FavoriteButtonProps {
   listingId: string;
@@ -14,6 +16,8 @@ export default function FavoriteButton({
   listingId,
   className = "",
 }: FavoriteButtonProps) {
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
@@ -40,6 +44,11 @@ export default function FavoriteButton({
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!session?.user) {
+      router.push("/sign-in");
+      return;
+    }
 
     setIsLoading(true);
 
@@ -98,7 +107,7 @@ export default function FavoriteButton({
       variant={isFavorite ? "default" : "outline"}
       onClick={handleToggleFavorite}
       disabled={isLoading}
-      className={`${isFavorite ? "bg-red-500 hover:bg-red-600" : ""} ${className}`}
+      className={`cursor-pointer ${isFavorite ? "bg-red-500 hover:bg-red-600" : ""} ${className}`}
     >
       <Heart className={`w-4 h-4 mr-2 ${isFavorite ? "fill-current" : ""}`} />
       {isFavorite ? "Added to Favorites" : "Add to Favorites"}

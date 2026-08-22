@@ -56,7 +56,7 @@ export default function RemoveFromFavoritesButton({
     <Button
       variant="outline"
       disabled={isRemoving}
-      className="w-full"
+      className="w-full cursor-pointer"
       onClick={handleRemoveFromFavorites}
     >
       <Heart className="w-4 h-4 mr-2" />

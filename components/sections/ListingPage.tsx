@@ -1,9 +1,9 @@
 import type { Prisma } from "@/generated/prisma/client";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { formatPrice, formatDate } from "@/lib/utils";
 import FavoriteButton from "@/components/buttons/FavoriteButton";
+import ContactSellerButton from "@/components/buttons/ContactSellerButton";
 
 type ListingWithRelations = Prisma.ListingGetPayload<{
   select: {
@@ -94,7 +94,7 @@ export default function ListingPage({
             </span>
           </div>
           {currentUserId !== listing.authorId && (
-            <Button className="w-full py-3">Contact Seller</Button>
+            <ContactSellerButton className="w-full py-3" />
           )}
 
           <FavoriteButton listingId={listing.id} className="w-full py-3" />

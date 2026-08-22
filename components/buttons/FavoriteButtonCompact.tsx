@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 import { toast } from "@/components/ui/toast";
+import { authClient } from "@/lib/auth-client";
 
 interface FavoriteButtonCompactProps {
   listingId: string;
@@ -13,6 +15,8 @@ export default function FavoriteButtonCompact({
   listingId,
   className = "",
 }: FavoriteButtonCompactProps) {
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,6 +39,11 @@ export default function FavoriteButtonCompact({
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!session?.user) {
+      router.push("/sign-in");
+      return;
+    }
 
     setIsLoading(true);
 
@@ -59,6 +68,14 @@ export default function FavoriteButtonCompact({
 
       const data = await response.json();
       setIsFavorite(data.favorited);
+
+      toast.add({
+        type: "success",
+        title: "Success",
+        description: data.favorited
+          ? "Added to favorites"
+          : "Removed from favorites",
+      });
     } catch (error) {
       toast.add({
         type: "error",
@@ -75,7 +92,7 @@ export default function FavoriteButtonCompact({
     <button
       onClick={handleToggleFavorite}
       disabled={isLoading}
-      className={`inline-flex items-center justify-center transition-all hover:scale-110 ${className}`}
+      className={`inline-flex items-center justify-center transition-all hover:scale-110 cursor-pointer ${className}`}
     >
       <Heart
         className={`w-6 h-6 transition-all ${
