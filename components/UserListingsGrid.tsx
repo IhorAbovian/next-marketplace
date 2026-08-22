@@ -1,24 +1,9 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { Trash2Icon, Heart, EditIcon } from "lucide-react";
-import { toast } from "@/components/ui/toast";
+import { EditIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogMedia,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import RemoveFromFavoritesButton from "@/components/buttons/RemoveFromFavoritesButton";
+import DeleteListingButton from "@/components/buttons/DeleteListingButton";
 
 interface Listing {
   id: string;
@@ -38,95 +23,10 @@ interface UserListingsGridProps {
 }
 
 export default function UserListingsGrid({
-  listings: initialListings,
+  listings,
   isFavoritesView = false,
 }: UserListingsGridProps) {
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [listings, setListings] = useState(initialListings);
-
-  const handleRemoveFromFavorites = async (listingId: string) => {
-    setDeletingId(listingId);
-    try {
-      const response = await fetch(`/api/favorites/${listingId}`, {
-        method: "POST",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Remove favorite error:", error);
-        toast.add({
-          type: "error",
-          title: "Error",
-          description: error.error || "Failed to remove from favorites",
-        });
-        return;
-      }
-
-      toast.add({
-        type: "success",
-        title: "Success",
-        description: "Removed from favorites",
-      });
-
-      setListings((prev) => {
-        return prev.filter((l) => l.id !== listingId);
-      });
-    } catch (error) {
-      toast.add({
-        type: "error",
-        title: "Error",
-        description: "Failed to remove from favorites",
-      });
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
-  const handleDelete = async (listingId: string) => {
-    setDeletingId(listingId);
-    try {
-      const response = await fetch(`/api/listings/${listingId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Delete error:", error);
-        toast.add({
-          type: "error",
-          title: "Error",
-          description: error.error || "Failed to delete listing",
-        });
-        return;
-      }
-
-      const data = await response.json();
-
-      toast.add({
-        type: "success",
-        title: "Success",
-        description: "Listing deleted successfully",
-      });
-
-      // Remove the deleted listing from local state
-
-      setListings((prev) => {
-        const filtered = prev.filter((l) => l.id !== listingId);
-
-        return filtered;
-      });
-    } catch (error) {
-      toast.add({
-        type: "error",
-        title: "Error",
-        description: "Failed to delete listing",
-      });
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
-  if (listings.length === 0) {
+  if (!listings || listings.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500 mb-4">You have no listings yet</p>
@@ -184,17 +84,7 @@ export default function UserListingsGrid({
             {/* Action Buttons */}
             <div className="p-4 pt-0">
               {isFavoritesView ? (
-                <Button
-                  variant="outline"
-                  disabled={deletingId === listing.id}
-                  className="w-full"
-                  onClick={() => handleRemoveFromFavorites(listing.id)}
-                >
-                  <Heart className="w-4 h-4 mr-2" />
-                  {deletingId === listing.id
-                    ? "Removing..."
-                    : "Remove from Favorites"}
-                </Button>
+                <RemoveFromFavoritesButton listingId={listing.id} />
               ) : (
                 <div className="flex gap-2">
                   <Link href={`/edit-listing/${listing.id}`} className="flex-1">
@@ -203,40 +93,7 @@ export default function UserListingsGrid({
                       Edit
                     </Button>
                   </Link>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        disabled={deletingId === listing.id}
-                        className="flex-1"
-                      >
-                        {deletingId === listing.id ? "Deleting..." : "Delete"}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent size="sm">
-                      <AlertDialogHeader>
-                        <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
-                          <Trash2Icon />
-                        </AlertDialogMedia>
-                        <AlertDialogTitle>Delete listing?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently
-                          delete listing.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel variant="outline">
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          variant="destructive"
-                          onClick={() => handleDelete(listing.id)}
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <DeleteListingButton listingId={listing.id} />
                 </div>
               )}
             </div>

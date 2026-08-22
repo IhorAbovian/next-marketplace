@@ -2,20 +2,22 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
-import { formatDate } from "@/lib/utils";
-import Link from "next/link";
-import ProfileSettingsForm from "@/components/ProfileSettingsForm";
-import UserListingsGrid from "@/components/UserListingsGrid";
+import ProfileTabs from "@/components/profile/ProfileTabs";
+import ProfileInfoTab from "@/components/profile/ProfileInfoTab";
+import ProfileListingsTab from "@/components/profile/ProfileListingsTab";
+import ProfileFavoritesTab from "@/components/profile/ProfileFavoritesTab";
+import ProfileSettingsTab from "@/components/profile/ProfileSettingsTab";
+
+export const dynamic = "force-dynamic";
 
 interface ProfilePageProps {
-  searchParams: {
+  searchParams: Promise<{
     tab?: string;
-  };
+  }>;
 }
 
 export default async function ProfilePage({ searchParams }: ProfilePageProps) {
+  const params = await searchParams;
   const sessionData = await auth.api.getSession({
     headers: await headers(),
   });
@@ -41,45 +43,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       })
     : null;
 
-  // Get user's listings if user exists
-  const listings = user
-    ? await prisma.listing.findMany({
-        where: { authorId: user.id },
-        include: {
-          images: true,
-          category: {
-            include: {
-              parent: true,
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-      })
-    : [];
-
-  // Get user's favorites if user exists
-  const favorites = user
-    ? await prisma.favorite.findMany({
-        where: { userId: user.id },
-        include: {
-          listing: {
-            include: {
-              images: true,
-              category: {
-                include: {
-                  parent: true,
-                },
-              },
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-      })
-    : [];
-
-  const favoriteListings = favorites.map((fav) => fav.listing);
-
-  const { tab: activeTab = "info" } = await searchParams;
+  const { tab: activeTab = "info" } = params;
 
   async function updateProfile(formData: FormData) {
     "use server";
@@ -92,7 +56,9 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
         where: { email: sessionData?.user.email },
         data: { name, phone },
       });
-    } catch (error) {}
+    } catch (error) {
+        console.error("Failed to update profile:", error);
+    }
 
     // Redirect to refresh the page with updated data
     redirect("/profile?tab=settings");
@@ -103,173 +69,25 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Sidebar Menu */}
         <div className="md:col-span-1">
-          <Card>
-            <CardContent className="p-4">
-              <div className="space-y-2">
-                <Link
-                  href="/profile?tab=info"
-                  className={`block px-4 py-3 rounded text-sm font-medium transition ${
-                    activeTab === "info"
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  Profile Info
-                </Link>
-                <Link
-                  href="/profile?tab=listings"
-                  className={`block px-4 py-3 rounded text-sm font-medium transition ${
-                    activeTab === "listings"
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  My Listings
-                </Link>
-                <Link
-                  href="/profile?tab=favorites"
-                  className={`block px-4 py-3 rounded text-sm font-medium transition ${
-                    activeTab === "favorites"
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  Favorites
-                </Link>
-                <Link
-                  href="/profile?tab=settings"
-                  className={`block px-4 py-3 rounded text-sm font-medium transition ${
-                    activeTab === "settings"
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  Settings
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+          <ProfileTabs activeTab={activeTab} />
         </div>
 
         {/* Main Content */}
         <div className="md:col-span-3">
-          {activeTab === "info" && (
-            <Card>
-              <CardContent className="p-8">
-                <div className="flex items-start gap-8">
-                  {user?.image ? (
-                    <Image
-                      src={user.image}
-                      alt={user?.name || "User"}
-                      width={160}
-                      height={160}
-                      className="w-40 h-40 rounded-lg object-cover flex-shrink-0"
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="w-40 h-40 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-gray-400 text-sm">No image</span>
-                    </div>
-                  )}
-
-                  <div className="flex-1">
-                    <h1 className="text-4xl font-bold mb-6">
-                      {user?.name || "User"}
-                    </h1>
-
-                    <div className="space-y-4 mb-8">
-                      <div className="border-b border-gray-200 pb-4">
-                        <p className="text-xs uppercase text-gray-500 font-semibold mb-1">
-                          Email
-                        </p>
-                        <p className="text-gray-900">{user?.email}</p>
-                      </div>
-
-                      {user?.phone && (
-                        <div className="border-b border-gray-200 pb-4">
-                          <p className="text-xs uppercase text-gray-500 font-semibold mb-1">
-                            Phone
-                          </p>
-                          <p className="text-gray-900">{user?.phone}</p>
-                        </div>
-                      )}
-
-                      <div>
-                        <p className="text-xs uppercase text-gray-500 font-semibold mb-1">
-                          Member Since
-                        </p>
-                        <p className="text-gray-900">
-                          {user?.createdAt && formatDate(user.createdAt)}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-200">
-                      <div className="bg-gray-50 p-4 rounded">
-                        <p className="text-xs uppercase text-gray-500 font-semibold mb-2">
-                          Total Listings
-                        </p>
-                        <p className="text-3xl font-bold text-gray-900">
-                          {user?._count.listings}
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded">
-                        <p className="text-xs uppercase text-gray-500 font-semibold mb-2">
-                          Favorites
-                        </p>
-                        <p className="text-3xl font-bold text-gray-900">
-                          {user?._count.favorites}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
+          {activeTab === "info" && <ProfileInfoTab user={user} />}
           {activeTab === "listings" && (
-            <Card>
-              <CardContent className="p-8">
-                <h2 className="text-2xl font-bold mb-6">My Listings</h2>
-                <UserListingsGrid listings={listings} />
-              </CardContent>
-            </Card>
+            <ProfileListingsTab userId={user?.id || ""} />
           )}
-
           {activeTab === "favorites" && (
-            <Card>
-              <CardContent className="p-8">
-                <h2 className="text-2xl font-bold mb-6">My Favorites</h2>
-                {favoriteListings.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className="text-gray-500 mb-2">No favorites yet</p>
-                    <p className="text-sm text-gray-400">
-                      Start adding listings to your favorites
-                    </p>
-                  </div>
-                ) : (
-                  <UserListingsGrid
-                    listings={favoriteListings}
-                    isFavoritesView={true}
-                  />
-                )}
-              </CardContent>
-            </Card>
+            <ProfileFavoritesTab userId={user?.id || ""} />
           )}
-
           {activeTab === "settings" && (
-            <Card>
-              <CardContent className="p-8">
-                <h2 className="text-2xl font-bold mb-6">Settings</h2>
-                <ProfileSettingsForm
-                  userId={user?.id || ""}
-                  initialName={user?.name || ""}
-                  initialPhone={user?.phone || ""}
-                  initialAvatar={user?.image || null}
-                />
-              </CardContent>
-            </Card>
+            <ProfileSettingsTab
+              userId={user?.id || ""}
+              initialName={user?.name || ""}
+              initialPhone={user?.phone || ""}
+              initialAvatar={user?.image || null}
+            />
           )}
         </div>
       </div>

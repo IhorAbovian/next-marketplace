@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
   const formData = await request.formData();
   const name = formData.get("name") as string;
-  const phone = formData.get("phone") as string;
+  const phone = (formData.get("phone") as string) || null;
 
   try {
     await prisma.user.update({

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import PhoneInput from "react-phone-number-input";
+import { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Camera } from "lucide-react";
@@ -17,7 +18,6 @@ interface ProfileSettingsFormProps {
 }
 
 export default function ProfileSettingsForm({
-  userId,
   initialName,
   initialPhone,
   initialAvatar,
@@ -41,12 +41,21 @@ export default function ProfileSettingsForm({
       if (res.ok) {
         const data = await res.json();
         setAvatar(data.url);
-        toast.add({ type: "success", title: "Success", description: "Avatar uploaded successfully" });
+        toast.add({
+          type: "success",
+          title: "Success",
+          description: "Avatar uploaded successfully",
+        });
       } else {
         throw new Error("Upload failed");
       }
     } catch (error) {
-      toast.add({ type: "error", title: "Error", description: "Failed to upload avatar" });
+      toast.add({
+        type: "error",
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to upload avatar",
+      });
     } finally {
       setUploading(false);
     }
@@ -55,8 +64,18 @@ export default function ProfileSettingsForm({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", name);
+    // Validate phone if provided
+    if (phone && !isValidPhoneNumber(phone)) {
+      toast.add({
+        type: "error",
+        title: "Error",
+        description: "Please enter a valid phone number",
+      });
+      return;
+    }
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
     formData.append("phone", phone);
 
     try {
@@ -79,7 +98,8 @@ export default function ProfileSettingsForm({
       toast.add({
         type: "error",
         title: "Error",
-        description: "Failed to update profile",
+        description:
+          error instanceof Error ? error.message : "Failed to update profile",
       });
     }
   };
@@ -110,7 +130,9 @@ export default function ProfileSettingsForm({
         </div>
       </div>
 
-      {uploading && <p className="text-sm text-gray-500 text-center">Загрузка...</p>}
+      {uploading && (
+        <p className="text-sm text-gray-500 text-center">Loading...</p>
+      )}
 
       <div>
         <label className="block text-sm font-medium mb-2">Name</label>

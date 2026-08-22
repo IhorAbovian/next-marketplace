@@ -149,16 +149,14 @@ export default function CreateListingForm({
       const { url } = await uploadRes.json();
 
       // Create listing
-      const listingFormData = new FormData();
-      listingFormData.append("title", form.title);
-      listingFormData.append("description", form.description);
-      listingFormData.append("price", form.price);
-      listingFormData.append("imageUrl", url);
-      listingFormData.append("categoryId", form.categoryId);
+      const listingFormData = e.target as HTMLFormElement;
+      const formData = new FormData(listingFormData);
+      formData.append("imageUrl", url);
+      formData.append("categoryId", form.categoryId);
 
       const listingRes = await fetch("/api/listings/create", {
         method: "POST",
-        body: listingFormData,
+        body: formData,
       });
 
       if (!listingRes.ok) {
@@ -216,7 +214,7 @@ export default function CreateListingForm({
               Title *
             </label>
             <Input
-              id="title"
+              name="title"
               type="text"
               placeholder="Enter listing title"
               value={form.title}
@@ -237,7 +235,7 @@ export default function CreateListingForm({
               Description
             </label>
             <textarea
-              id="description"
+              name="description"
               placeholder="Enter listing description"
               value={form.description}
               onChange={(e) =>
@@ -258,7 +256,7 @@ export default function CreateListingForm({
               Price *
             </label>
             <Input
-              id="price"
+              name="price"
               type="number"
               placeholder="Enter price"
               step="0.01"
@@ -283,7 +281,7 @@ export default function CreateListingForm({
               value={selectedParentId}
               onValueChange={handleCategoryChange}
             >
-              <SelectTrigger id="category">
+              <SelectTrigger name="category">
                 {selectedCategoryName ? (
                   <span>{selectedCategoryName}</span>
                 ) : (
@@ -321,7 +319,7 @@ export default function CreateListingForm({
                   }
                 }}
               >
-                <SelectTrigger id="subcategory">
+                <SelectTrigger name="subcategory">
                   {selectedSubcategoryName ? (
                     <span>{selectedSubcategoryName}</span>
                   ) : (

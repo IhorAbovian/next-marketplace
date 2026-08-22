@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
 import CategorySelect from "./CategorySelect";
 import type { Prisma } from "@/generated/prisma/browser";
+import { useSearchParams } from "next/navigation";
 
 type CategoryWithRelations = Prisma.CategoryGetPayload<{
   select: {
@@ -20,25 +20,33 @@ type CategoryWithRelations = Prisma.CategoryGetPayload<{
 
 export default function SearchBar({
   categories,
-  initialValue = "",
-  initialCategory = "",
 }: {
   categories: CategoryWithRelations[];
-  initialValue?: string;
-  initialCategory?: string;
 }) {
   const router = useRouter();
-  // Use initialValue directly as default, and key prop ensures re-mount
-  const [query, setQuery] = useState(() => initialValue || "");
-  const [selectedCategory, setSelectedCategory] = useState(
-    () => initialCategory || "",
-  );
+  const searchParams = useSearchParams();
+
+  const query = searchParams.get("q") || "";
+  const category = searchParams.get("category") || "";
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
     const params = new URLSearchParams();
-    if (query.trim()) params.set("q", query.trim());
-    if (selectedCategory) params.set("category", selectedCategory);
+
+    const q = formData.get("q") as string;
+    if (q) {
+      params.set("q", q);
+    }
+
+    const category = formData.get("category") as string;
+    if (category) {
+      params.set("category", category);
+    }
+
     router.push(`/search?${params.toString()}`);
   };
 
@@ -49,19 +57,15 @@ export default function SearchBar({
     >
       <input
         type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        name="q"
+        defaultValue={query}
         placeholder="What are you looking for?"
         className="flex-1 px-4 py-3 border-none focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
       />
 
       <div className="w-px h-10 bg-gray-300"></div>
 
-      <CategorySelect
-        categories={categories}
-        value={selectedCategory}
-        onChange={setSelectedCategory}
-      />
+      <CategorySelect categories={categories} defaultValue={category} />
 
       <button
         type="submit"

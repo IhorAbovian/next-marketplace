@@ -27,21 +27,18 @@ type CategoryWithRelations = Prisma.CategoryGetPayload<{
   };
 }>;
 
+type CategorySelectProps = {
+  categories: CategoryWithRelations[];
+  onChange?: (value: unknown) => void;
+} & React.ComponentProps<typeof Select>;
+
 export default function CategorySelect({
   categories,
-  value,
   onChange,
-}: {
-  categories: CategoryWithRelations[];
-  value?: string;
-  onChange?: (value: string) => void;
-}) {
-  const handleCategoryChange = (val: string | null) => {
-    onChange?.(val || "");
-  };
-
+  ...restProps
+}: CategorySelectProps) {
   return (
-    <Select value={value} onValueChange={handleCategoryChange}>
+    <Select name="category" onValueChange={onChange} {...restProps}>
       <SelectTrigger className="border-none w-48">
         <SelectValue placeholder="All Categories" />
       </SelectTrigger>

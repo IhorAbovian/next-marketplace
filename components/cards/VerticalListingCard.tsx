@@ -4,7 +4,7 @@ import { IMAGE_PLACEHOLDER } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
-import FavoriteButtonCompact from "@/components/FavoriteButtonCompact";
+import FavoriteButtonCompact from "@/components/buttons/FavoriteButtonCompact";
 
 export type VerticalListingWithRelations = Prisma.ListingGetPayload<{
   select: {

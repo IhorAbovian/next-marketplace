@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { formatPrice, formatDate } from "@/lib/utils";
-import FavoriteButton from "@/components/FavoriteButton";
+import FavoriteButton from "@/components/buttons/FavoriteButton";
 
 type ListingWithRelations = Prisma.ListingGetPayload<{
   select: {
