@@ -35,9 +35,6 @@ export default async function ProfileFavoritesTab({
         {favoriteListings.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 mb-2">No favorites yet</p>
-            <p className="text-sm text-gray-400">
-              Start adding listings to your favorites
-            </p>
           </div>
         ) : (
           <UserListingsGrid

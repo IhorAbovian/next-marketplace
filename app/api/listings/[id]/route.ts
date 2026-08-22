@@ -151,7 +151,11 @@ export async function DELETE(
       );
     }
 
-    // First delete all related images, then delete the listing
+    // First delete all related favorites, then images, then the listing
+    await prisma.favorite.deleteMany({
+      where: { listingId: id },
+    });
+
     await prisma.image.deleteMany({
       where: { listingId: id },
     });
