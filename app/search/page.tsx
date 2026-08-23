@@ -30,9 +30,11 @@ async function SearchResults({
   page: number;
 }) {
   const params = new URLSearchParams();
+
   if (query) params.set("q", query);
   if (category) params.set("category", category);
   if (sort) params.set("sort", sort);
+
   params.set("page", page.toString());
 
   const headersList = await headers();
