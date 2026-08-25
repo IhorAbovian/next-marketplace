@@ -14,6 +14,7 @@ export type Listing = {
   images: { url: string }[];
   category: {
     slug: string;
+    name: string;
     parent: { slug: string } | null;
   };
 };
@@ -48,7 +49,11 @@ export async function getHomePageData(): Promise<{
         description: true,
         images: { take: 1, select: { url: true } },
         category: {
-          select: { slug: true, parent: { select: { slug: true } } },
+          select: {
+            slug: true,
+            name: true,
+            parent: { select: { slug: true } },
+          },
         },
       },
     }),
@@ -68,11 +73,90 @@ export async function getHomePageData(): Promise<{
         description: true,
         images: { take: 1, select: { url: true } },
         category: {
-          select: { slug: true, parent: { select: { slug: true } } },
+          select: {
+            slug: true,
+            name: true,
+            parent: { select: { slug: true } },
+          },
         },
       },
     }),
   ]);
 
   return { categories, autosListings, realEstateListings };
+}
+
+export type ProfileUser = {
+  id: string;
+  name: string | null;
+  email: string;
+  phone: string | null;
+  image: string | null;
+  createdAt: Date;
+  _count: {
+    listings: number;
+    favorites: number;
+  };
+};
+
+export async function getProfilePageData(
+  userEmail: string,
+): Promise<ProfileUser | null> {
+  return await prisma.user.findUnique({
+    where: { email: userEmail },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      image: true,
+      createdAt: true,
+      _count: {
+        select: {
+          listings: true,
+          favorites: true,
+        },
+      },
+    },
+  });
+}
+
+export async function getUserListings(userId: string): Promise<Listing[]> {
+  return await prisma.listing.findMany({
+    where: { authorId: userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      description: true,
+      images: { take: 1, select: { url: true } },
+      category: {
+        select: { slug: true, name: true, parent: { select: { slug: true } } },
+      },
+    },
+  });
+}
+
+export async function getUserFavorites(userId: string): Promise<Listing[]> {
+  return await prisma.listing.findMany({
+    where: {
+      favorites: {
+        some: {
+          userId: userId,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      description: true,
+      images: { take: 1, select: { url: true } },
+      category: {
+        select: { slug: true, name: true, parent: { select: { slug: true } } },
+      },
+    },
+  });
 }

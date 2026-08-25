@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { prisma } from "@/lib/prisma";
 import UserListingsGrid from "@/components/UserListingsGrid";
+import { getUserFavorites } from "@/lib/data";
 
 interface ProfileFavoritesTabProps {
   userId: string;
@@ -9,24 +9,7 @@ interface ProfileFavoritesTabProps {
 export default async function ProfileFavoritesTab({
   userId,
 }: ProfileFavoritesTabProps) {
-  const favorites = await prisma.favorite.findMany({
-    where: { userId },
-    include: {
-      listing: {
-        include: {
-          images: true,
-          category: {
-            include: {
-              parent: true,
-            },
-          },
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  const favoriteListings = favorites.map((fav) => fav.listing);
+  const favoriteListings = await getUserFavorites(userId);
 
   return (
     <Card>

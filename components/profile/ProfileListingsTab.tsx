@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { prisma } from "@/lib/prisma";
 import UserListingsGrid from "@/components/UserListingsGrid";
+import { getUserListings } from "@/lib/data";
 
 interface ProfileListingsTabProps {
   userId: string;
@@ -9,18 +9,7 @@ interface ProfileListingsTabProps {
 export default async function ProfileListingsTab({
   userId,
 }: ProfileListingsTabProps) {
-  const listings = await prisma.listing.findMany({
-    where: { authorId: userId },
-    include: {
-      images: true,
-      category: {
-        include: {
-          parent: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const listings = await getUserListings(userId);
 
   return (
     <Card>
