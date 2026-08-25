@@ -221,3 +221,50 @@ export async function getSearchValue(
     totalPages: Math.ceil(total / 20),
   };
 }
+
+export async function getCategoryListings(
+  categorySlug: string,
+): Promise<Listing[]> {
+  return await prisma.listing.findMany({
+    where: { category: { slug: categorySlug } },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      description: true,
+      images: { take: 1, select: { url: true } },
+      category: {
+        select: { slug: true, name: true, parent: { select: { slug: true } } },
+      },
+    },
+  });
+}
+
+export async function getListingById(
+  id: string,
+  subcategory: string,
+): Promise<Listing | null> {
+  return await prisma.listing.findFirst({
+    where: {
+      id,
+      category: { slug: subcategory },
+    },
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      description: true,
+      images: { select: { url: true } },
+      category: {
+        select: {
+          slug: true,
+          name: true,
+          parent: { select: { slug: true, name: true } },
+        },
+      },
+      author: { select: { name: true, image: true, createdAt: true } },
+      authorId: true,
+    },
+  });
+}

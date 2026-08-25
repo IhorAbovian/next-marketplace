@@ -1,20 +1,8 @@
 import ListingSection from "@/components/sections/ListingSection";
-import { prisma } from "@/lib/prisma";
+import { getCategoryListings } from "@/lib/data";
 
 export default async function CarsTrucksPage() {
-  const listings = await prisma.listing.findMany({
-    where: { category: { slug: "cars-trucks" } },
-    take: 10,
-    select: {
-      id: true,
-      title: true,
-      price: true,
-
-      description: true,
-      images: { take: 1, select: { url: true } },
-      category: { select: { slug: true, parent: { select: { slug: true } } } },
-    },
-  });
+  const listings = await getCategoryListings("cars-trucks");
 
   return <ListingSection title="Cars & Trucks" listings={listings} />;
 }

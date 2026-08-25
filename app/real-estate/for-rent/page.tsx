@@ -1,19 +1,8 @@
 import ListingSection from "@/components/sections/ListingSection";
-import { prisma } from "@/lib/prisma";
+import { getCategoryListings } from "@/lib/data";
 
 export default async function ForRentPage() {
-  const listings = await prisma.listing.findMany({
-    where: { category: { slug: "for-rent" } },
-    take: 20,
-    select: {
-      id: true,
-      title: true,
-      price: true,
-      description: true,
-      images: { take: 1, select: { url: true } },
-      category: { select: { slug: true, parent: { select: { slug: true } } } },
-    },
-  });
+  const listings = await getCategoryListings("for-rent");
 
   return <ListingSection title="For Rent" listings={listings} />;
 }
