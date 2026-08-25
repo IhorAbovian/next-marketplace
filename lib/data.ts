@@ -160,3 +160,64 @@ export async function getUserFavorites(userId: string): Promise<Listing[]> {
     },
   });
 }
+
+export async function getSearchValue(
+  query: string,
+  category: string,
+  sort: string,
+  page: number,
+): Promise<{
+  listings: Listing[];
+  totalPages: number;
+}> {
+  const skip = (page - 1) * 20;
+  const where: any = {};
+
+  if (query) {
+    where.OR = [
+      { title: { contains: query, mode: "insensitive" } },
+      { description: { contains: query, mode: "insensitive" } },
+    ];
+  }
+
+  if (category) {
+    where.category = {
+      OR: [{ slug: category }, { parent: { slug: category } }],
+    };
+  }
+
+  const orderBy: any = {};
+  if (sort === "newest") orderBy.createdAt = "desc";
+  if (sort === "oldest") orderBy.createdAt = "asc";
+  if (sort === "price-low") orderBy.price = "asc";
+  if (sort === "price-high") orderBy.price = "desc";
+
+  const [listings, total] = await Promise.all([
+    prisma.listing.findMany({
+      where,
+      orderBy,
+      skip,
+      take: 20,
+      select: {
+        id: true,
+        title: true,
+        price: true,
+        description: true,
+        images: { take: 1, select: { url: true } },
+        category: {
+          select: {
+            slug: true,
+            name: true,
+            parent: { select: { slug: true } },
+          },
+        },
+      },
+    }),
+    prisma.listing.count({ where }),
+  ]);
+
+  return {
+    listings,
+    totalPages: Math.ceil(total / 20),
+  };
+}
