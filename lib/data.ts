@@ -33,8 +33,13 @@ export async function getHomePageData(): Promise<{
       },
     }),
     prisma.listing.findMany({
-      where: { category: { slug: "autos" } },
-      take: 10,
+      where: {
+        OR: [
+          { category: { slug: "autos" } },
+          { category: { parent: { slug: "autos" } } },
+        ],
+      },
+      take: 5,
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -48,8 +53,13 @@ export async function getHomePageData(): Promise<{
       },
     }),
     prisma.listing.findMany({
-      where: { category: { slug: "real-estate" } },
-      take: 10,
+      where: {
+        OR: [
+          { category: { slug: "real-estate" } },
+          { category: { parent: { slug: "real-estate" } } },
+        ],
+      },
+      take: 5,
       orderBy: { createdAt: "desc" },
       select: {
         id: true,

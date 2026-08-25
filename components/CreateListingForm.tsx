@@ -149,8 +149,10 @@ export default function CreateListingForm({
       const { url } = await uploadRes.json();
 
       // Create listing
-      const listingFormData = e.target as HTMLFormElement;
-      const formData = new FormData(listingFormData);
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("description", form.description);
+      formData.append("price", form.price);
       formData.append("imageUrl", url);
       formData.append("categoryId", form.categoryId);
 
