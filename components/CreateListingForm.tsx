@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/ImageUpload";
 import { Loader2 } from "lucide-react";
 import { toast } from "@/components/ui/toast";
+import { createListing } from "@/lib/actions";
 
 interface Category {
   id: string;
@@ -149,22 +150,13 @@ export default function CreateListingForm({
       const { url } = await uploadRes.json();
 
       // Create listing
-      const formData = new FormData();
-      formData.append("title", form.title);
-      formData.append("description", form.description);
-      formData.append("price", form.price);
-      formData.append("imageUrl", url);
-      formData.append("categoryId", form.categoryId);
-
-      const listingRes = await fetch("/api/listings/create", {
-        method: "POST",
-        body: formData,
+      await createListing({
+        title: form.title,
+        description: form.description,
+        price: form.price,
+        imageUrl: url,
+        categoryId: form.categoryId,
       });
-
-      if (!listingRes.ok) {
-        const errorData = await listingRes.json();
-        throw new Error(errorData.error || "Failed to create listing");
-      }
 
       toast.add({
         type: "success",

@@ -12,9 +12,10 @@ import {
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/ImageUpload";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import Image from "next/image";
+import { editListing } from "@/lib/actions";
 
 interface Category {
   id: string;
@@ -52,6 +53,7 @@ interface FormState {
   price: string;
   categoryId: string;
   isLoading: boolean;
+  imageRemoved: boolean;
 }
 
 interface EditListingFormProps {
@@ -72,6 +74,7 @@ export default function EditListingForm({
     price: String(listing.price),
     categoryId: listing.category.id,
     isLoading: false,
+    imageRemoved: false,
   });
 
   const [selectedParentId, setSelectedParentId] = useState<string>(
@@ -111,6 +114,7 @@ export default function EditListingForm({
       ...prev,
       image: null,
       preview: null,
+      imageRemoved: true,
     }));
   };
 
@@ -157,7 +161,7 @@ export default function EditListingForm({
     setForm((prev) => ({ ...prev, isLoading: true }));
 
     try {
-      let imageUrl = listing.images[0]?.url;
+      let imageUrl: string | undefined;
 
       // Upload new image if selected
       if (form.image) {
@@ -175,23 +179,19 @@ export default function EditListingForm({
 
         const { url } = await uploadRes.json();
         imageUrl = url;
+      } else if (form.imageRemoved) {
+        // If image was removed, pass empty string to delete it
+        imageUrl = "";
       }
 
-      // Update listing
-      const listingFormData = e.target as HTMLFormElement;
-      const formData = new FormData(listingFormData);
-      formData.append("imageUrl", imageUrl);
-      formData.append("categoryId", form.categoryId);
-
-      const listingRes = await fetch(`/api/listings/${listing.id}`, {
-        method: "PUT",
-        body: formData,
+      // Call editListing Server Action with only changed fields
+      await editListing(listing.id, {
+        title: form.title,
+        description: form.description,
+        price: form.price,
+        categoryId: form.categoryId,
+        imageUrl: imageUrl,
       });
-
-      if (!listingRes.ok) {
-        const errorData = await listingRes.json();
-        throw new Error(errorData.error || "Failed to update listing");
-      }
 
       toast.add({
         type: "success",
@@ -233,6 +233,12 @@ export default function EditListingForm({
                 preview={form.preview}
                 onRemove={handleRemoveImage}
               />
+            ) : form.imageRemoved ? (
+              <ImageUpload
+                onImageSelect={handleImageSelect}
+                preview={undefined}
+                onRemove={handleRemoveImage}
+              />
             ) : listing.images && listing.images.length > 0 ? (
               <div className="relative">
                 <div className="relative h-48 bg-gray-200 rounded-lg overflow-hidden mb-4">
@@ -242,18 +248,15 @@ export default function EditListingForm({
                     fill
                     className="object-cover"
                   />
+                  {/* X button in corner - always visible */}
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1 transition-colors"
+                  >
+                    <X size={20} />
+                  </button>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() =>
-                    document
-                      .querySelector<HTMLInputElement>('input[type="file"]')
-                      ?.click()
-                  }
-                >
-                  Change Image
-                </Button>
                 <ImageUpload
                   onImageSelect={handleImageSelect}
                   preview={undefined}
