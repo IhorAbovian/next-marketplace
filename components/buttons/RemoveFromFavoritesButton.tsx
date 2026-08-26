@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
+import { toggleFavorite } from "@/lib/actions";
 
 interface RemoveFromFavoritesButtonProps {
   listingId: string;
@@ -19,20 +20,7 @@ export default function RemoveFromFavoritesButton({
   const handleRemoveFromFavorites = async () => {
     setIsRemoving(true);
     try {
-      const response = await fetch(`/api/favorites/${listingId}`, {
-        method: "POST",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Remove favorite error:", error);
-        toast.add({
-          type: "error",
-          title: "Error",
-          description: error.error || "Failed to remove from favorites",
-        });
-        return;
-      }
+      await toggleFavorite(listingId);
 
       toast.add({
         type: "success",
@@ -45,7 +33,10 @@ export default function RemoveFromFavoritesButton({
       toast.add({
         type: "error",
         title: "Error",
-        description: "Failed to remove from favorites",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to remove from favorites",
       });
     } finally {
       setIsRemoving(false);

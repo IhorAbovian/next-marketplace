@@ -109,9 +109,12 @@ export async function editListing(
 
   const updateData: any = {};
   if (data.title !== undefined) updateData.title = data.title;
+
   if (data.description !== undefined)
     updateData.description = data.description || null;
+
   if (data.price !== undefined) updateData.price = parseFloat(data.price);
+
   if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
 
   if (data.imageUrl !== undefined) {
@@ -135,4 +138,72 @@ export async function editListing(
     },
     data: updateData,
   });
+}
+
+export async function isFavoritedByUser(listingId: string): Promise<boolean> {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user?.email) return false;
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+
+  if (!user) return false;
+
+  const favorite = await prisma.favorite.findUnique({
+    where: {
+      userId_listingId: {
+        userId: user.id,
+        listingId,
+      },
+    },
+  });
+
+  return !!favorite;
+}
+
+export async function toggleFavorite(listingId: string) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user?.email) throw new Error("Unauthorized");
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  // Check if favorite exists
+  const existingFavorite = await prisma.favorite.findUnique({
+    where: {
+      userId_listingId: {
+        userId: user.id,
+        listingId,
+      },
+    },
+  });
+
+  if (existingFavorite) {
+    // Remove from favorites
+    return await prisma.favorite.delete({
+      where: {
+        id: existingFavorite.id,
+      },
+    });
+  } else {
+    // Add to favorites
+    return await prisma.favorite.create({
+      data: {
+        userId: user.id,
+        listingId,
+      },
+    });
+  }
 }

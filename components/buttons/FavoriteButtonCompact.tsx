@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
+import { toggleFavorite, isFavoritedByUser } from "@/lib/actions";
 
 interface FavoriteButtonCompactProps {
   listingId: string;
@@ -23,11 +24,8 @@ export default function FavoriteButtonCompact({
   useEffect(() => {
     const checkFavorite = async () => {
       try {
-        const response = await fetch(`/api/favorites/${listingId}`);
-        if (response.ok) {
-          const data = await response.json();
-          setIsFavorite(data.favorited);
-        }
+        const favorited = await isFavoritedByUser(listingId);
+        setIsFavorite(favorited);
       } catch (error) {
         console.error("Error checking favorite:", error);
       }
@@ -48,31 +46,16 @@ export default function FavoriteButtonCompact({
     setIsLoading(true);
 
     try {
-      const response = await fetch(`/api/favorites/${listingId}`, {
-        method: "POST",
-      });
+      await toggleFavorite(listingId);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        if (response.status === 401) {
-          toast.add({
-            type: "error",
-            title: "Error",
-            description: "Please sign in to add favorites",
-          });
-        } else {
-          throw new Error(errorData.error || "Failed to toggle favorite");
-        }
-        return;
-      }
-
-      const data = await response.json();
-      setIsFavorite(data.favorited);
+      // After toggle, check the new state
+      const newFavoritedState = await isFavoritedByUser(listingId);
+      setIsFavorite(newFavoritedState);
 
       toast.add({
         type: "success",
         title: "Success",
-        description: data.favorited
+        description: newFavoritedState
           ? "Added to favorites"
           : "Removed from favorites",
       });
