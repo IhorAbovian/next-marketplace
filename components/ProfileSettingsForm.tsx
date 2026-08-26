@@ -10,6 +10,8 @@ import "react-phone-number-input/style.css";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Camera } from "lucide-react";
 
+import { updateProfile } from "@/lib/actions";
+
 interface ProfileSettingsFormProps {
   userId: string;
   initialName: string | null;
@@ -79,21 +81,13 @@ export default function ProfileSettingsForm({
     formData.append("phone", phone);
 
     try {
-      const response = await fetch("/api/profile/update", {
-        method: "POST",
-        body: formData,
-      });
+      await updateProfile(formData);
 
-      if (response.ok) {
-        // Success - data saved
-        toast.add({
-          type: "success",
-          title: "Success",
-          description: "Profile updated successfully",
-        });
-      } else {
-        throw new Error("Save failed");
-      }
+      toast.add({
+        type: "success",
+        title: "Success",
+        description: "Profile updated successfully",
+      });
     } catch (error) {
       toast.add({
         type: "error",

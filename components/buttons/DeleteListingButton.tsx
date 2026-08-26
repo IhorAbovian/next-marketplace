@@ -6,6 +6,7 @@ import { Trash2Icon } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 
+import { deleteListing } from "@/lib/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,20 +34,7 @@ export default function DeleteListingButton({
     setIsDeleting(true);
 
     try {
-      const response = await fetch(`/api/listings/${listingId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Delete error:", error);
-        toast.add({
-          type: "error",
-          title: "Error",
-          description: error.error || "Failed to delete listing",
-        });
-        return;
-      }
+      await deleteListing(listingId);
 
       toast.add({
         type: "success",
