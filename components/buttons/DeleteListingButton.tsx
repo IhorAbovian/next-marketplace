@@ -44,10 +44,12 @@ export default function DeleteListingButton({
 
       router.refresh();
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete listing";
       toast.add({
         type: "error",
         title: "Error",
-        description: "Failed to delete listing",
+        description: errorMessage,
       });
     } finally {
       setIsDeleting(false);

@@ -27,7 +27,21 @@ export async function deleteListing(listingId: string) {
 
   if (!session?.user?.email) throw new Error("Unauthorized");
 
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  await prisma.image.deleteMany({
+    where: { listingId },
+  });
+
   return await prisma.listing.delete({
-    where: { id: listingId, user: { email: session.user.email } },
+    where: {
+      id: listingId,
+      authorId: user.id,
+    },
   });
 }
