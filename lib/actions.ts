@@ -4,11 +4,30 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 
-export async function updateProfile(formData: FormData) {
-  const session = await auth.api.getSession({
+// Helper functions for authentication
+async function getSession() {
+  return auth.api.getSession({
     headers: await headers(),
   });
+}
 
+async function getAuthenticatedUser() {
+  const session = await getSession();
+
+  if (!session?.user?.email) throw new Error("Unauthorized");
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  return user;
+}
+
+export async function updateProfile(formData: FormData) {
+  const session = await getSession();
   if (!session?.user?.email) throw new Error("Unauthorized");
 
   const name = formData.get("name") as string;
@@ -21,18 +40,7 @@ export async function updateProfile(formData: FormData) {
 }
 
 export async function deleteListing(listingId: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user?.email) throw new Error("Unauthorized");
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
-
-  if (!user) throw new Error("User not found");
+  const user = await getAuthenticatedUser();
 
   await prisma.image.deleteMany({
     where: { listingId },
@@ -53,18 +61,7 @@ export async function createListing(data: {
   imageUrl: string;
   categoryId: string;
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user?.email) throw new Error("Unauthorized");
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
-
-  if (!user) throw new Error("User not found");
+  const user = await getAuthenticatedUser();
 
   const listing = await prisma.listing.create({
     data: {
@@ -94,18 +91,7 @@ export async function editListing(
     imageUrl?: string;
   },
 ) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user?.email) throw new Error("Unauthorized");
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
-
-  if (!user) throw new Error("User not found");
+  const user = await getAuthenticatedUser();
 
   const updateData: any = {};
   if (data.title !== undefined) updateData.title = data.title;
@@ -141,9 +127,7 @@ export async function editListing(
 }
 
 export async function isFavoritedByUser(listingId: string): Promise<boolean> {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const session = await getSession();
 
   if (!session?.user?.email) return false;
 
@@ -167,18 +151,7 @@ export async function isFavoritedByUser(listingId: string): Promise<boolean> {
 }
 
 export async function toggleFavorite(listingId: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user?.email) throw new Error("Unauthorized");
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
-
-  if (!user) throw new Error("User not found");
+  const user = await getAuthenticatedUser();
 
   // Check if favorite exists
   const existingFavorite = await prisma.favorite.findUnique({
