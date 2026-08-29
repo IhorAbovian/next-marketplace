@@ -50,7 +50,7 @@ export default async function SearchPage({
             {listings.map((listing: Listing) => (
               <Link
                 key={listing.id}
-                href={`/${listing.category.parent?.slug || listing.category.slug}/${listing.category.slug}/${listing.id}`}
+                href={`/listings/${listing.category.parent?.slug || listing.category.slug}/${listing.category.slug}/${listing.id}`}
                 className="block border rounded-lg overflow-hidden hover:shadow-lg transition"
               >
                 <div className="relative h-48 bg-gray-200">

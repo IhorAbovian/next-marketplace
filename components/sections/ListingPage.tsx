@@ -62,7 +62,7 @@ export default function ListingPage({
           </>
         )}
         <Link
-          href={`/${listing.category.parent?.slug}/${listing.category.slug}`}
+          href={`/listings/${listing.category.parent?.slug}/${listing.category.slug}`}
         >
           {listing.category.name}
         </Link>

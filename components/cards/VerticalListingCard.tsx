@@ -27,8 +27,8 @@ export default function VerticalListingCard({
   const isSubcategory = category.parent?.slug;
 
   const href = isSubcategory
-    ? `/${category.parent?.slug}/${category.slug}/${id}`
-    : `/${category.slug}/${id}`;
+    ? `/listings/${category.parent?.slug}/${category.slug}/${id}`
+    : `/listings/${category.slug}/${id}`;
 
   const mainImageSrc = images[0]?.url || IMAGE_PLACEHOLDER;
 

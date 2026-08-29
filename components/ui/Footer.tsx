@@ -10,7 +10,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="/autos/cars-trucks"
+                  href="/listings/autos/cars-trucks"
                   className="text-gray-300 hover:text-white"
                 >
                   Cars & Trucks
@@ -18,7 +18,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/autos/motorcycles"
+                  href="/listings/autos/motorcycles"
                   className="text-gray-300 hover:text-white"
                 >
                   Motorcycles
@@ -26,7 +26,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/autos/boats"
+                  href="/listings/autos/boats"
                   className="text-gray-300 hover:text-white"
                 >
                   Boats
@@ -34,7 +34,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/real-estate"
+                  href="/listings/real-estate/for-sale"
                   className="text-gray-300 hover:text-white"
                 >
                   Real Estate

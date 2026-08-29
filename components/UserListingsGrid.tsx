@@ -44,8 +44,8 @@ export default function UserListingsGrid({
     >
       {listings.map((listing) => {
         const detailHref = listing.category.parent
-          ? `/${listing.category.parent.slug}/${listing.category.slug}/${listing.id}`
-          : `/${listing.category.slug}/${listing.id}`;
+          ? `/listings/${listing.category.parent.slug}/${listing.category.slug}/${listing.id}`
+          : `/listings/${listing.category.slug}/${listing.id}`;
 
         return (
           <div

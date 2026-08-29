@@ -79,7 +79,7 @@ export default async function Header() {
                     {category.children.map((child) => (
                       <NavigationMenuLink
                         key={child.slug}
-                        href={`/${category.slug}/${child.slug}`}
+                        href={`/listings/${category.slug}/${child.slug}`}
                         className="px-4 py-2 hover:bg-gray-100 rounded"
                       >
                         {child.name}
