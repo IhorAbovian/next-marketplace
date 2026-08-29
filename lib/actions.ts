@@ -3,6 +3,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
+import { createListingSchema } from "@/lib/schemas/listing.schema";
 
 // Helper functions for authentication
 async function getSession() {
@@ -61,24 +62,45 @@ export async function createListing(data: {
   imageUrl: string;
   categoryId: string;
 }) {
-  const user = await getAuthenticatedUser();
+  try {
+    const user = await getAuthenticatedUser();
 
-  const listing = await prisma.listing.create({
-    data: {
+    const parsed = createListingSchema.safeParse({
       title: data.title,
-      description: data.description || null,
-      price: parseFloat(data.price),
+      description: data.description,
+      price: data.price,
+      imageUrl: data.imageUrl,
       categoryId: data.categoryId,
-      authorId: user.id,
-      images: {
-        create: {
-          url: data.imageUrl,
+    });
+
+    if (!parsed.success) {
+      const firstError = Object.values(
+        parsed.error.flatten().fieldErrors,
+      )[0]?.[0];
+      return { error: firstError || "Validation failed" };
+    }
+
+    const listing = await prisma.listing.create({
+      data: {
+        title: parsed.data.title,
+        description: parsed.data.description || null,
+        price: Number(parsed.data.price),
+        categoryId: parsed.data.categoryId,
+        authorId: user.id,
+        images: {
+          create: {
+            url: parsed.data.imageUrl,
+          },
         },
       },
-    },
-  });
+    });
 
-  return listing;
+    return { success: true, listing };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return { error: errorMessage };
+  }
 }
 
 export async function editListing(

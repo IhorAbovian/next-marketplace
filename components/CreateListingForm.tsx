@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,6 +17,10 @@ import ImageUpload from "@/components/ImageUpload";
 import { Loader2 } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { createListing } from "@/lib/actions";
+import {
+  createListingSchema,
+  type CreateListingInput,
+} from "@/lib/schemas/listing.schema";
 
 interface Category {
   id: string;
@@ -27,16 +33,6 @@ interface Category {
   }>;
 }
 
-interface FormState {
-  image: File | null;
-  preview: string | null;
-  title: string;
-  description: string;
-  price: string;
-  categoryId: string;
-  isLoading: boolean;
-}
-
 interface CreateListingFormProps {
   categories: Category[];
 }
@@ -45,41 +41,39 @@ export default function CreateListingForm({
   categories,
 }: CreateListingFormProps) {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>({
-    image: null,
-    preview: null,
-    title: "",
-    description: "",
-    price: "",
-    categoryId: "",
-    isLoading: false,
-  });
-
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedParentId, setSelectedParentId] = useState<string>("");
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
   const [selectedSubcategoryName, setSelectedSubcategoryName] =
     useState<string>("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch,
+    setValue,
+  } = useForm<CreateListingInput>({
+    resolver: zodResolver(createListingSchema),
+    mode: "onBlur",
+  });
+
+  const categoryId = watch("categoryId");
   const selectedParent = categories.find((cat) => cat.id === selectedParentId);
 
   const handleImageSelect = (file: File) => {
-    setForm((prev) => ({ ...prev, image: file }));
-
+    setImageFile(file);
     const reader = new FileReader();
     reader.onloadend = () => {
-      setForm((prev) => ({
-        ...prev,
-        preview: reader.result as string,
-      }));
+      setImagePreview(reader.result as string);
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemoveImage = () => {
-    setForm((prev) => ({
-      ...prev,
-      image: null,
-      preview: null,
-    }));
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   const handleCategoryChange = (value: string | null) => {
@@ -87,15 +81,13 @@ export default function CreateListingForm({
       const selectedCat = categories.find((cat) => cat.id === value);
       setSelectedParentId(value);
       setSelectedCategoryName(selectedCat?.name || "");
-      setForm((prev) => ({ ...prev, categoryId: "" }));
+      setValue("categoryId", "");
       setSelectedSubcategoryName("");
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!form.image) {
+  const onSubmit = handleSubmit(async (data) => {
+    if (!imageFile) {
       toast.add({
         type: "error",
         title: "Error",
@@ -104,39 +96,10 @@ export default function CreateListingForm({
       return;
     }
 
-    if (!form.title.trim()) {
-      toast.add({
-        type: "error",
-        title: "Error",
-        description: "Please enter a title",
-      });
-      return;
-    }
-
-    if (!form.price.trim()) {
-      toast.add({
-        type: "error",
-        title: "Error",
-        description: "Please enter a price",
-      });
-      return;
-    }
-
-    if (!form.categoryId) {
-      toast.add({
-        type: "error",
-        title: "Error",
-        description: "Please select a category",
-      });
-      return;
-    }
-
-    setForm((prev) => ({ ...prev, isLoading: true }));
-
     try {
       // Upload image
       const imageFormData = new FormData();
-      imageFormData.append("file", form.image);
+      imageFormData.append("file", imageFile);
 
       const uploadRes = await fetch("/api/upload", {
         method: "POST",
@@ -150,13 +113,19 @@ export default function CreateListingForm({
       const { url } = await uploadRes.json();
 
       // Create listing
-      await createListing({
-        title: form.title,
-        description: form.description,
-        price: form.price,
+      const result = await createListing({
+        ...data,
         imageUrl: url,
-        categoryId: form.categoryId,
       });
+
+      if (result.error) {
+        toast.add({
+          type: "error",
+          title: "Error",
+          description: result.error,
+        });
+        return;
+      }
 
       toast.add({
         type: "success",
@@ -173,10 +142,8 @@ export default function CreateListingForm({
         title: "Error",
         description: errorMessage,
       });
-    } finally {
-      setForm((prev) => ({ ...prev, isLoading: false }));
     }
-  };
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
@@ -184,7 +151,7 @@ export default function CreateListingForm({
         <h1 className="text-3xl font-bold mb-8">Create New Listing</h1>
 
         <form
-          onSubmit={handleSubmit}
+          onSubmit={onSubmit}
           className="bg-white rounded-lg shadow p-8 space-y-6"
         >
           {/* Image Upload */}
@@ -194,7 +161,7 @@ export default function CreateListingForm({
             </label>
             <ImageUpload
               onImageSelect={handleImageSelect}
-              preview={form.preview || undefined}
+              preview={imagePreview || undefined}
               onRemove={handleRemoveImage}
             />
           </div>
@@ -208,16 +175,16 @@ export default function CreateListingForm({
               Title *
             </label>
             <Input
-              name="title"
+              {...register("title")}
               type="text"
               placeholder="Enter listing title"
-              value={form.title}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, title: e.target.value }))
-              }
-              disabled={form.isLoading}
-              required
+              disabled={isSubmitting}
             />
+            {errors.title && (
+              <p className="text-sm text-red-600 mt-1">
+                {errors.title.message}
+              </p>
+            )}
           </div>
 
           {/* Description */}
@@ -229,16 +196,17 @@ export default function CreateListingForm({
               Description
             </label>
             <textarea
-              name="description"
+              {...register("description")}
               placeholder="Enter listing description"
-              value={form.description}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, description: e.target.value }))
-              }
-              disabled={form.isLoading}
+              disabled={isSubmitting}
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
             />
+            {errors.description && (
+              <p className="text-sm text-red-600 mt-1">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           {/* Price */}
@@ -250,17 +218,17 @@ export default function CreateListingForm({
               Price *
             </label>
             <Input
-              name="price"
+              {...register("price")}
               type="number"
               placeholder="Enter price"
               step="0.01"
-              value={form.price}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, price: e.target.value }))
-              }
-              disabled={form.isLoading}
-              required
+              disabled={isSubmitting}
             />
+            {errors.price && (
+              <p className="text-sm text-red-600 mt-1">
+                {errors.price.message}
+              </p>
+            )}
           </div>
 
           {/* Category */}
@@ -302,13 +270,13 @@ export default function CreateListingForm({
                 Subcategory *
               </label>
               <Select
-                value={form.categoryId}
+                value={categoryId}
                 onValueChange={(value) => {
                   if (value) {
                     const selectedSubcat = selectedParent?.children.find(
                       (c) => c.id === value,
                     );
-                    setForm((prev) => ({ ...prev, categoryId: value }));
+                    setValue("categoryId", value);
                     setSelectedSubcategoryName(selectedSubcat?.name || "");
                   }
                 }}
@@ -328,6 +296,11 @@ export default function CreateListingForm({
                   ))}
                 </SelectContent>
               </Select>
+              {errors.categoryId && (
+                <p className="text-sm text-red-600 mt-1">
+                  {errors.categoryId.message}
+                </p>
+              )}
             </div>
           )}
 
@@ -335,14 +308,14 @@ export default function CreateListingForm({
           {selectedParent && selectedParent.children.length === 0 && (
             <input
               type="hidden"
-              value={form.categoryId || selectedParentId}
+              value={categoryId || selectedParentId}
               onChange={() => {}}
             />
           )}
 
           {/* Submit Button */}
-          <Button type="submit" disabled={form.isLoading}>
-            {form.isLoading ? (
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Creating...
