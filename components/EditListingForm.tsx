@@ -16,6 +16,7 @@ import { Loader2, X } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import Image from "next/image";
 import { editListing } from "@/lib/actions";
+import type { Prisma } from "@/generated/prisma/client";
 
 interface Category {
   id: string;
@@ -28,28 +29,22 @@ interface Category {
   }>;
 }
 
-interface ListingImage {
-  url: string;
-}
-
-interface ListingWithCategory {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  images: ListingImage[];
-  category: {
-    id: string;
-    name: string;
-    parent?: { id: string; name: string } | null;
+type ListingWithCategory = Prisma.ListingGetPayload<{
+  include: {
+    images: true;
+    category: {
+      include: {
+        parent: true;
+      };
+    };
   };
-}
+}>;
 
 interface FormState {
   image: File | null;
   preview: string | null;
   title: string;
-  description: string;
+  description: string | null;
   price: string;
   categoryId: string;
   isLoading: boolean;
@@ -91,6 +86,7 @@ export default function EditListingForm({
   useEffect(() => {
     // Auto-select parent if listing has a subcategory
     if (listing.category.parent) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedParentId(listing.category.parent.id);
       setSelectedCategoryName(listing.category.parent.name);
     }
@@ -188,7 +184,7 @@ export default function EditListingForm({
       await editListing(listing.id, {
         title: form.title,
         description: form.description,
-        price: form.price,
+        price: Number(form.price),
         categoryId: form.categoryId,
         imageUrl: imageUrl,
       });
@@ -304,7 +300,7 @@ export default function EditListingForm({
             <textarea
               name="description"
               placeholder="Enter listing description"
-              value={form.description}
+              value={form.description || ""}
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, description: e.target.value }))
               }

@@ -1,42 +1,23 @@
 "use server";
 
-import { auth } from "@/lib/auth";
+import { getAuthenticatedUser, getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { headers } from "next/headers";
-import { createListingSchema } from "@/lib/schemas/listing.schema";
-
-// Helper functions for authentication
-async function getSession() {
-  return auth.api.getSession({
-    headers: await headers(),
-  });
-}
-
-async function getAuthenticatedUser() {
-  const session = await getSession();
-
-  if (!session?.user?.email) throw new Error("Unauthorized");
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  });
-
-  if (!user) throw new Error("User not found");
-
-  return user;
-}
+import {
+  createListingSchema,
+  editListingSchema,
+  type CreateListingInput,
+  type EditListingInput,
+} from "@/lib/schemas/listing.schema";
 
 export async function updateProfile(formData: FormData) {
-  const session = await getSession();
-  if (!session?.user?.email) throw new Error("Unauthorized");
+  const user = await getAuthenticatedUser();
 
   const name = formData.get("name") as string;
   const phone = formData.get("phone") as string;
 
   return await prisma.user.update({
-    where: { email: session.user.email },
-    data: { name, phone },
+    where: { email: user.email },
+    data: { name, phone: phone.replaceAll(" ", "") },
   });
 }
 
@@ -55,28 +36,17 @@ export async function deleteListing(listingId: string) {
   });
 }
 
-export async function createListing(data: {
-  title: string;
-  description: string;
-  price: string;
-  imageUrl: string;
-  categoryId: string;
-}) {
+export async function createListing(data: CreateListingInput) {
   try {
     const user = await getAuthenticatedUser();
 
-    const parsed = createListingSchema.safeParse({
-      title: data.title,
-      description: data.description,
-      price: data.price,
-      imageUrl: data.imageUrl,
-      categoryId: data.categoryId,
-    });
+    const parsed = createListingSchema.safeParse(data);
 
     if (!parsed.success) {
       const firstError = Object.values(
         parsed.error.flatten().fieldErrors,
       )[0]?.[0];
+
       return { error: firstError || "Validation failed" };
     }
 
@@ -103,40 +73,35 @@ export async function createListing(data: {
   }
 }
 
-export async function editListing(
-  listingId: string,
-  data: {
-    title?: string;
-    description?: string;
-    price?: string;
-    categoryId?: string;
-    imageUrl?: string;
-  },
-) {
+export async function editListing(listingId: string, data: EditListingInput) {
   const user = await getAuthenticatedUser();
 
-  const updateData: any = {};
-  if (data.title !== undefined) updateData.title = data.title;
+  const parsed = editListingSchema.safeParse(data);
 
-  if (data.description !== undefined)
-    updateData.description = data.description || null;
+  if (!parsed.success) {
+    const firstError = Object.values(
+      parsed.error.flatten().fieldErrors,
+    )[0]?.[0];
 
-  if (data.price !== undefined) updateData.price = parseFloat(data.price);
+    return { error: firstError || "Validation failed" };
+  }
 
-  if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
+  const updateData: EditListingInput & {
+    images?: { create: { url: string } };
+  } = {
+    ...parsed.data,
+  };
 
-  if (data.imageUrl !== undefined) {
+  if (updateData.imageUrl !== undefined) {
     await prisma.image.deleteMany({
       where: { listingId },
     });
 
-    if (data.imageUrl) {
-      updateData.images = {
-        create: {
-          url: data.imageUrl,
-        },
-      };
-    }
+    updateData.images = {
+      create: {
+        url: updateData.imageUrl,
+      },
+    };
   }
 
   return await prisma.listing.update({

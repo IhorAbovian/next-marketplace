@@ -58,11 +58,12 @@ export default function DeleteListingButton({
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
+      <AlertDialogTrigger>
         <Button variant="destructive" disabled={isDeleting} className="flex-1">
           {isDeleting ? "Deleting..." : "Delete"}
         </Button>
       </AlertDialogTrigger>
+
       <AlertDialogContent size="sm">
         <AlertDialogHeader>
           <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">

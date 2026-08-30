@@ -8,6 +8,7 @@ const eslintConfig = defineConfig([
   {
     rules: {
       "no-console": ["warn"],
+      "react/no-unescaped-entities": "off",
     },
   },
   // Override default ignores of eslint-config-next.

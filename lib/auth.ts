@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prisma } from "./prisma";
 import { createAuthMiddleware } from "better-auth/api";
+import { headers } from "next/headers";
 
 export const auth = betterAuth({
   hooks: {
@@ -74,3 +75,18 @@ export const auth = betterAuth({
     },
   },
 });
+
+// Helper functions for authentication
+export async function getSession() {
+  return auth.api.getSession({
+    headers: await headers(),
+  });
+}
+
+export async function getAuthenticatedUser() {
+  const session = await getSession();
+
+  if (!session?.user?.email) throw new Error("Unauthorized");
+
+  return { ...session.user, id: session.user.userId }; // Assuming userId is the unique identifier for the user
+}

@@ -21,8 +21,6 @@ export default function Page() {
   } = useForm<ContactInput>({ resolver: zodResolver(contactSchema) });
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log({ data });
-
     await submitContactAction(data);
   });
 

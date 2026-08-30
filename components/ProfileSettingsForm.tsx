@@ -12,12 +12,11 @@ import { Camera } from "lucide-react";
 
 import { updateProfile } from "@/lib/actions";
 
-interface ProfileSettingsFormProps {
-  userId: string;
+export type ProfileSettingsFormProps = {
   initialName: string | null;
   initialPhone: string | null;
   initialAvatar?: string | null;
-}
+};
 
 export default function ProfileSettingsForm({
   initialName,
@@ -79,6 +78,8 @@ export default function ProfileSettingsForm({
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     formData.append("phone", phone);
+
+    console.log({ phone2: phone });
 
     try {
       await updateProfile(formData);
@@ -142,9 +143,12 @@ export default function ProfileSettingsForm({
         <PhoneInput
           name="phone"
           value={phone}
-          onChange={setPhone}
+          onChange={(value) => {
+            setPhone(value || "");
+          }}
           placeholder="Phone (optional)"
           defaultCountry="CA"
+          countries={["CA", "US"]}
         />
       </div>
       <Button type="submit">Save Changes</Button>

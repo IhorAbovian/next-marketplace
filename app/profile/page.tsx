@@ -52,12 +52,12 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
     try {
       // Update user through Prisma using email to find the right record
-      const updatedUser = await prisma.user.update({
+      await prisma.user.update({
         where: { email: sessionData?.user.email },
         data: { name, phone },
       });
     } catch (error) {
-        console.error("Failed to update profile:", error);
+      console.error("Failed to update profile:", error);
     }
 
     // Redirect to refresh the page with updated data
@@ -83,7 +83,6 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           )}
           {activeTab === "settings" && (
             <ProfileSettingsTab
-              userId={user?.id || ""}
               initialName={user?.name || ""}
               initialPhone={user?.phone || ""}
               initialAvatar={user?.image || null}

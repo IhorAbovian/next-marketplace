@@ -2,13 +2,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import UserListingsGrid from "@/components/UserListingsGrid";
 import { getUserListings } from "@/lib/data";
 
-interface ProfileListingsTabProps {
-  userId: string;
-}
-
 export default async function ProfileListingsTab({
   userId,
-}: ProfileListingsTabProps) {
+}: {
+  userId: string;
+}) {
   const listings = await getUserListings(userId);
 
   return (
