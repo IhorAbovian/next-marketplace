@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -118,7 +118,9 @@ export default function CreateListingForm({
       formData.set("categoryId", categoryId || selectedParentId);
       formData.set("imageUrl", url);
 
-      action(formData);
+      startTransition(() => {
+        action(formData);
+      });
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Unknown error";

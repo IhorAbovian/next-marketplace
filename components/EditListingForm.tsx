@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { startTransition, useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -182,7 +182,9 @@ export default function EditListingForm({
         formData.set("imageUrl", imageUrl);
       }
 
-      action(formData);
+      startTransition(() => {
+        action(formData);
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       toast.add({
