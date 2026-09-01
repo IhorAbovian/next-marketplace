@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +18,7 @@ import Image from "next/image";
 import { editListing } from "@/lib/actions";
 import type { Prisma } from "@/generated/prisma/client";
 import type { CategoryWithChildren } from "@/lib/data";
+import { useActionState } from "react";
 
 export type ListingWithCategory = Prisma.ListingGetPayload<{
   include: {
@@ -30,17 +31,6 @@ export type ListingWithCategory = Prisma.ListingGetPayload<{
   };
 }>;
 
-type FormState = {
-  image: File | null;
-  preview: string | null;
-  title: string;
-  description: string | null;
-  price: string;
-  categoryId: string;
-  isLoading: boolean;
-  imageRemoved: boolean;
-};
-
 type EditListingFormProps = {
   listing: ListingWithCategory;
   categories: CategoryWithChildren[];
@@ -51,16 +41,15 @@ export default function EditListingForm({
   categories,
 }: EditListingFormProps) {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>({
-    image: null,
-    preview: null,
-    title: listing.title,
-    description: listing.description,
-    price: String(listing.price),
-    categoryId: listing.category.id,
-    isLoading: false,
-    imageRemoved: false,
-  });
+  const [state, action, isPending] = useActionState(editListing, null);
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
+  const [title, setTitle] = useState(listing.title);
+  const [description, setDescription] = useState(listing.description || "");
+  const [price, setPrice] = useState(String(listing.price));
+  const [categoryId, setCategoryId] = useState(listing.category.id);
 
   const [selectedParentId, setSelectedParentId] = useState<string>(
     listing.category.parent?.id || "",
@@ -72,36 +61,45 @@ export default function EditListingForm({
     useState<string>(listing.category.name);
 
   const selectedParent = categories.find((cat) => cat.id === selectedParentId);
+  const handledStateRef = useRef<typeof state>(null);
 
   useEffect(() => {
-    // Auto-select parent if listing has a subcategory
-    if (listing.category.parent) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedParentId(listing.category.parent.id);
-      setSelectedCategoryName(listing.category.parent.name);
+    if (!state || handledStateRef.current === state) return;
+    handledStateRef.current = state;
+
+    if (state.error) {
+      toast.add({
+        type: "error",
+        title: "Error",
+        description: state.error,
+      });
     }
-  }, [listing]);
+
+    if (state.success) {
+      toast.add({
+        type: "success",
+        title: "Success",
+        description: "Listing updated successfully",
+      });
+
+      router.push("/profile?tab=listings");
+    }
+  }, [state, router]);
 
   const handleImageSelect = (file: File) => {
-    setForm((prev) => ({ ...prev, image: file }));
+    setImageFile(file);
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setForm((prev) => ({
-        ...prev,
-        preview: reader.result as string,
-      }));
+      setImagePreview(reader.result as string);
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemoveImage = () => {
-    setForm((prev) => ({
-      ...prev,
-      image: null,
-      preview: null,
-      imageRemoved: true,
-    }));
+    setImageFile(null);
+    setImagePreview(null);
+    setImageRemoved(true);
   };
 
   const handleCategoryChange = (value: string | null) => {
@@ -109,7 +107,7 @@ export default function EditListingForm({
       const selectedCat = categories.find((cat) => cat.id === value);
       setSelectedParentId(value);
       setSelectedCategoryName(selectedCat?.name || "");
-      setForm((prev) => ({ ...prev, categoryId: "" }));
+      setCategoryId("");
       setSelectedSubcategoryName("");
     }
   };
@@ -117,7 +115,11 @@ export default function EditListingForm({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!form.title.trim()) {
+    // Capture the form before any await — React nulls out currentTarget once
+    // the synthetic event is released after the handler yields.
+    const form = e.currentTarget;
+
+    if (!title.trim()) {
       toast.add({
         type: "error",
         title: "Error",
@@ -126,7 +128,7 @@ export default function EditListingForm({
       return;
     }
 
-    if (!form.price.trim()) {
+    if (!price.trim()) {
       toast.add({
         type: "error",
         title: "Error",
@@ -135,7 +137,9 @@ export default function EditListingForm({
       return;
     }
 
-    if (!form.categoryId) {
+    const finalCategoryId = categoryId || selectedParentId;
+
+    if (!finalCategoryId) {
       toast.add({
         type: "error",
         title: "Error",
@@ -144,15 +148,13 @@ export default function EditListingForm({
       return;
     }
 
-    setForm((prev) => ({ ...prev, isLoading: true }));
-
     try {
       let imageUrl: string | undefined;
 
       // Upload new image if selected
-      if (form.image) {
+      if (imageFile) {
         const imageFormData = new FormData();
-        imageFormData.append("file", form.image);
+        imageFormData.append("file", imageFile);
 
         const uploadRes = await fetch("/api/upload", {
           method: "POST",
@@ -165,28 +167,22 @@ export default function EditListingForm({
 
         const { url } = await uploadRes.json();
         imageUrl = url;
-      } else if (form.imageRemoved) {
+      } else if (imageRemoved) {
         // If image was removed, pass empty string to delete it
         imageUrl = "";
       }
 
-      // Call editListing Server Action with only changed fields
-      await editListing(listing.id, {
-        title: form.title,
-        description: form.description,
-        price: Number(form.price),
-        categoryId: form.categoryId,
-        imageUrl: imageUrl,
-      });
+      const formData = new FormData(form);
+      formData.set("listingId", listing.id);
+      formData.set("title", title);
+      formData.set("description", description);
+      formData.set("price", price);
+      formData.set("categoryId", finalCategoryId);
+      if (imageUrl !== undefined) {
+        formData.set("imageUrl", imageUrl);
+      }
 
-      toast.add({
-        type: "success",
-        title: "Success",
-        description: "Listing updated successfully",
-      });
-
-      router.push("/profile?tab=listings");
-      router.refresh();
+      action(formData);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       toast.add({
@@ -194,8 +190,6 @@ export default function EditListingForm({
         title: "Error",
         description: errorMessage,
       });
-    } finally {
-      setForm((prev) => ({ ...prev, isLoading: false }));
     }
   };
 
@@ -213,13 +207,13 @@ export default function EditListingForm({
             <label className="block text-sm font-medium text-gray-700 mb-4">
               Photo
             </label>
-            {form.preview ? (
+            {imagePreview ? (
               <ImageUpload
                 onImageSelect={handleImageSelect}
-                preview={form.preview}
+                preview={imagePreview}
                 onRemove={handleRemoveImage}
               />
-            ) : form.imageRemoved ? (
+            ) : imageRemoved ? (
               <ImageUpload
                 onImageSelect={handleImageSelect}
                 preview={undefined}
@@ -270,11 +264,9 @@ export default function EditListingForm({
               name="title"
               type="text"
               placeholder="Enter listing title"
-              value={form.title}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, title: e.target.value }))
-              }
-              disabled={form.isLoading}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={isPending}
               required
             />
           </div>
@@ -290,11 +282,9 @@ export default function EditListingForm({
             <textarea
               name="description"
               placeholder="Enter listing description"
-              value={form.description || ""}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, description: e.target.value }))
-              }
-              disabled={form.isLoading}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={isPending}
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
             />
@@ -313,11 +303,9 @@ export default function EditListingForm({
               type="number"
               placeholder="Enter price"
               step="0.01"
-              value={form.price}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, price: e.target.value }))
-              }
-              disabled={form.isLoading}
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              disabled={isPending}
               required
             />
           </div>
@@ -361,13 +349,13 @@ export default function EditListingForm({
                 Subcategory *
               </label>
               <Select
-                value={form.categoryId}
+                value={categoryId}
                 onValueChange={(value) => {
                   if (value) {
                     const selectedSubcat = selectedParent?.children.find(
                       (c) => c.id === value,
                     );
-                    setForm((prev) => ({ ...prev, categoryId: value }));
+                    setCategoryId(value);
                     setSelectedSubcategoryName(selectedSubcat?.name || "");
                   }
                 }}
@@ -390,18 +378,9 @@ export default function EditListingForm({
             </div>
           )}
 
-          {/* If no subcategories, use parent */}
-          {selectedParent && selectedParent.children.length === 0 && (
-            <input
-              type="hidden"
-              value={form.categoryId || selectedParentId}
-              onChange={() => {}}
-            />
-          )}
-
           {/* Submit Button */}
-          <Button type="submit" disabled={form.isLoading}>
-            {form.isLoading ? (
+          <Button type="submit" disabled={isPending}>
+            {isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Updating...

@@ -5,7 +5,7 @@ export const createListingSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.coerce.number<number>().min(1, "Price must be greater than 0"),
   categoryId: z.string().min(1, "Category is required"),
-  imageUrl: z.string().url("Must be a valid image URL"),
+  imageUrl: z.string().min(1, "Image is required"),
 });
 
 export type CreateListingInput = z.infer<typeof createListingSchema>;
@@ -22,7 +22,7 @@ export const editListingSchema = z.object({
     .min(1, "Price must be greater than 0")
     .optional(),
   categoryId: z.string().min(1, "Category is required").optional(),
-  imageUrl: z.string().url("Must be a valid image URL").optional(),
+  imageUrl: z.string().optional(),
 });
 
 export type EditListingInput = z.infer<typeof editListingSchema>;

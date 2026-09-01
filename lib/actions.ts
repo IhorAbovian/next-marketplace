@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import {
   createListingSchema,
   editListingSchema,
-  type CreateListingInput,
   type EditListingInput,
 } from "@/lib/schemas/listing.schema";
 
@@ -48,11 +47,20 @@ export async function deleteListing(listingId: string) {
   });
 }
 
-export async function createListing(data: CreateListingInput) {
+export async function createListing(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData,
+) {
   try {
     const user = await getAuthenticatedUser();
 
-    const parsed = createListingSchema.safeParse(data);
+    const parsed = createListingSchema.safeParse({
+      title: formData.get("title"),
+      description: formData.get("description"),
+      price: formData.get("price"),
+      categoryId: formData.get("categoryId"),
+      imageUrl: formData.get("imageUrl"),
+    });
 
     if (!parsed.success) {
       const firstError = Object.values(
@@ -62,7 +70,7 @@ export async function createListing(data: CreateListingInput) {
       return { error: firstError || "Validation failed" };
     }
 
-    const listing = await prisma.listing.create({
+    await prisma.listing.create({
       data: {
         title: parsed.data.title,
         description: parsed.data.description || null,
@@ -77,7 +85,7 @@ export async function createListing(data: CreateListingInput) {
       },
     });
 
-    return { success: true, listing };
+    return { success: true };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
@@ -85,44 +93,64 @@ export async function createListing(data: CreateListingInput) {
   }
 }
 
-export async function editListing(listingId: string, data: EditListingInput) {
-  const user = await getAuthenticatedUser();
+export async function editListing(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData,
+) {
+  try {
+    const user = await getAuthenticatedUser();
 
-  const parsed = editListingSchema.safeParse(data);
+    const listingId = formData.get("listingId") as string;
+    const imageUrl = formData.get("imageUrl");
 
-  if (!parsed.success) {
-    const firstError = Object.values(
-      parsed.error.flatten().fieldErrors,
-    )[0]?.[0];
-
-    return { error: firstError || "Validation failed" };
-  }
-
-  const updateData: EditListingInput & {
-    images?: { create: { url: string } };
-  } = {
-    ...parsed.data,
-  };
-
-  if (updateData.imageUrl !== undefined) {
-    await prisma.image.deleteMany({
-      where: { listingId },
+    const parsed = editListingSchema.safeParse({
+      title: formData.get("title") ?? undefined,
+      description: formData.get("description") ?? undefined,
+      price: formData.get("price") ?? undefined,
+      categoryId: formData.get("categoryId") ?? undefined,
+      imageUrl: imageUrl === null ? undefined : imageUrl,
     });
 
-    updateData.images = {
-      create: {
-        url: updateData.imageUrl,
-      },
-    };
-  }
+    if (!parsed.success) {
+      const firstError = Object.values(
+        parsed.error.flatten().fieldErrors,
+      )[0]?.[0];
 
-  return await prisma.listing.update({
-    where: {
-      id: listingId,
-      authorId: user.id,
-    },
-    data: updateData,
-  });
+      return { error: firstError || "Validation failed" };
+    }
+
+    const updateData: EditListingInput & {
+      images?: { create: { url: string } };
+    } = {
+      ...parsed.data,
+    };
+
+    if (updateData.imageUrl !== undefined) {
+      await prisma.image.deleteMany({
+        where: { listingId },
+      });
+
+      updateData.images = {
+        create: {
+          url: updateData.imageUrl,
+        },
+      };
+    }
+
+    await prisma.listing.update({
+      where: {
+        id: listingId,
+        authorId: user.id,
+      },
+      data: updateData,
+    });
+
+    return { success: true };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return { error: errorMessage };
+  }
 }
 
 export async function isFavoritedByUser(listingId: string): Promise<boolean> {
