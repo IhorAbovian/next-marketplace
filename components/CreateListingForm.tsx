@@ -21,25 +21,19 @@ import {
   createListingSchema,
   type CreateListingInput,
 } from "@/lib/schemas/listing.schema";
+import { Prisma } from "@/generated/prisma/client";
 
-interface Category {
-  id: string;
-  name: string;
-  children: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    parentId: string | null;
-  }>;
-}
-
-interface CreateListingFormProps {
-  categories: Category[];
-}
+type CategoryWithChildren = Prisma.CategoryGetPayload<{
+  include: {
+    children: true;
+  };
+}>;
 
 export default function CreateListingForm({
   categories,
-}: CreateListingFormProps) {
+}: {
+  categories: CategoryWithChildren[];
+}) {
   const router = useRouter();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);

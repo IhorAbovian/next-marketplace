@@ -5,11 +5,11 @@ import { useDropzone } from "react-dropzone";
 import { UploadIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 
-interface ImageUploadProps {
+type ImageUploadProps = {
   onImageSelect: (file: File) => void;
   preview?: string;
   onRemove?: () => void;
-}
+};
 
 export default function ImageUpload({
   onImageSelect,

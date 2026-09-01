@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 
-interface ProfileTabsProps {
+type ProfileTabsProps = {
   activeTab: string;
-}
+};
 
 export default function ProfileTabs({ activeTab }: ProfileTabsProps) {
   const tabs = [

@@ -1,20 +1,28 @@
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { formatDate } from "@/lib/utils";
+import { Prisma } from "@/generated/prisma/client";
 
-interface ProfileInfoTabProps {
-  user: {
-    name: string | null;
-    email: string;
-    phone: string | null;
-    image: string | null;
-    createdAt: Date;
+type UserWithCounts = Prisma.UserGetPayload<{
+  select: {
+    id: true;
+    name: true;
+    email: true;
+    phone: true;
+    image: true;
+    createdAt: true;
     _count: {
-      listings: number;
-      favorites: number;
+      select: {
+        listings: true;
+        favorites: true;
+      };
     };
-  } | null;
-}
+  };
+}>;
+
+type ProfileInfoTabProps = {
+  user: UserWithCounts | null;
+};
 
 export default function ProfileInfoTab({ user }: ProfileInfoTabProps) {
   return (

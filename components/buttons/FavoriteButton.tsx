@@ -8,10 +8,10 @@ import { toast } from "@/components/ui/toast";
 import { authClient } from "@/lib/auth-client";
 import { toggleFavorite, isFavoritedByUser } from "@/lib/actions";
 
-interface FavoriteButtonProps {
+type FavoriteButtonProps = {
   listingId: string;
   className?: string;
-}
+};
 
 export default function FavoriteButton({
   listingId,

@@ -10,11 +10,11 @@ import ProfileSettingsTab from "@/components/profile/ProfileSettingsTab";
 
 export const dynamic = "force-dynamic";
 
-interface ProfilePageProps {
+type ProfilePageProps = {
   searchParams: Promise<{
     tab?: string;
   }>;
-}
+};
 
 export default async function ProfilePage({ searchParams }: ProfilePageProps) {
   const params = await searchParams;

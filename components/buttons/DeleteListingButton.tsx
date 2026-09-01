@@ -20,9 +20,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-interface DeleteListingButtonProps {
+type DeleteListingButtonProps = {
   listingId: string;
-}
+};
 
 export default function DeleteListingButton({
   listingId,

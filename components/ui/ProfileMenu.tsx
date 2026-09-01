@@ -11,9 +11,9 @@ import {
   NavigationMenuList,
 } from "./navigation-menu";
 
-interface ProfileMenuProps {
+type ProfileMenuProps = {
   userName?: string | null;
-}
+};
 
 export default function ProfileMenu({ userName }: ProfileMenuProps) {
   const router = useRouter();

@@ -2,9 +2,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import UserListingsGrid from "@/components/UserListingsGrid";
 import { getUserFavorites } from "@/lib/data";
 
-interface ProfileFavoritesTabProps {
+type ProfileFavoritesTabProps = {
   userId: string;
-}
+};
 
 export default async function ProfileFavoritesTab({
   userId,

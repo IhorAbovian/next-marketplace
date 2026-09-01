@@ -18,18 +18,13 @@ import Image from "next/image";
 import { editListing } from "@/lib/actions";
 import type { Prisma } from "@/generated/prisma/client";
 
-interface Category {
-  id: string;
-  name: string;
-  children: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    parentId: string | null;
-  }>;
-}
+export type CategoryWithChildren = Prisma.CategoryGetPayload<{
+  include: {
+    children: true;
+  };
+}>;
 
-type ListingWithCategory = Prisma.ListingGetPayload<{
+export type ListingWithCategory = Prisma.ListingGetPayload<{
   include: {
     images: true;
     category: {
@@ -40,7 +35,7 @@ type ListingWithCategory = Prisma.ListingGetPayload<{
   };
 }>;
 
-interface FormState {
+type FormState = {
   image: File | null;
   preview: string | null;
   title: string;
@@ -49,12 +44,12 @@ interface FormState {
   categoryId: string;
   isLoading: boolean;
   imageRemoved: boolean;
-}
+};
 
-interface EditListingFormProps {
+type EditListingFormProps = {
   listing: ListingWithCategory;
-  categories: Category[];
-}
+  categories: CategoryWithChildren[];
+};
 
 export default function EditListingForm({
   listing,

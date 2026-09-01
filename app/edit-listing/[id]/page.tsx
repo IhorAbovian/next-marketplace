@@ -4,11 +4,11 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import EditListingForm from "@/components/EditListingForm";
 
-interface EditListingPageProps {
+type EditListingPageProps = {
   params: Promise<{
     id: string;
   }>;
-}
+};
 
 export default async function EditListingPage({
   params,

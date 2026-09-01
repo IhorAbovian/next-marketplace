@@ -7,9 +7,9 @@ import { toast } from "@/components/ui/toast";
 import { Button } from "@/components/ui/button";
 import { toggleFavorite } from "@/lib/actions";
 
-interface RemoveFromFavoritesButtonProps {
+type RemoveFromFavoritesButtonProps = {
   listingId: string;
-}
+};
 
 export default function RemoveFromFavoritesButton({
   listingId,

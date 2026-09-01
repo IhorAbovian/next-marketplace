@@ -4,23 +4,23 @@ import { EditIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RemoveFromFavoritesButton from "@/components/buttons/RemoveFromFavoritesButton";
 import DeleteListingButton from "@/components/buttons/DeleteListingButton";
+import { Prisma } from "@/generated/prisma/client";
 
-interface Listing {
-  id: string;
-  title: string;
-  price: number;
-  images: { url: string }[];
-  category: {
-    name: string;
-    slug: string;
-    parent?: { slug: string } | null;
+type ListingWithCategory = Prisma.ListingGetPayload<{
+  include: {
+    images: true;
+    category: {
+      include: {
+        parent: true;
+      };
+    };
   };
-}
+}>;
 
-interface UserListingsGridProps {
-  listings: Listing[];
+type UserListingsGridProps = {
+  listings: ListingWithCategory[];
   isFavoritesView?: boolean;
-}
+};
 
 export default function UserListingsGrid({
   listings,
