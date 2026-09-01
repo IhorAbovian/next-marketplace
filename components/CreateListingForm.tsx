@@ -21,13 +21,7 @@ import {
   createListingSchema,
   type CreateListingInput,
 } from "@/lib/schemas/listing.schema";
-import { Prisma } from "@/generated/prisma/client";
-
-type CategoryWithChildren = Prisma.CategoryGetPayload<{
-  include: {
-    children: true;
-  };
-}>;
+import type { CategoryWithChildren } from "@/lib/data";
 
 export default function CreateListingForm({
   categories,

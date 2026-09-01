@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 
-type CategoryWithChildren = Prisma.CategoryGetPayload<{
+export type CategoryWithChildren = Prisma.CategoryGetPayload<{
   include: {
     children: true;
   };
@@ -66,7 +66,7 @@ export async function getHomePageData(): Promise<{
   return { categories, autosListings, realEstateListings };
 }
 
-type UserWithCounts = Prisma.UserGetPayload<{
+export type UserWithCounts = Prisma.UserGetPayload<{
   select: {
     id: true;
     name: true;

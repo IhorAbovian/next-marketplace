@@ -4,18 +4,7 @@ import { EditIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RemoveFromFavoritesButton from "@/components/buttons/RemoveFromFavoritesButton";
 import DeleteListingButton from "@/components/buttons/DeleteListingButton";
-import { Prisma } from "@/generated/prisma/client";
-
-type ListingWithCategory = Prisma.ListingGetPayload<{
-  include: {
-    images: true;
-    category: {
-      include: {
-        parent: true;
-      };
-    };
-  };
-}>;
+import type { ListingWithCategory } from "@/lib/data";
 
 type UserListingsGridProps = {
   listings: ListingWithCategory[];

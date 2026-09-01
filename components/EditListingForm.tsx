@@ -17,12 +17,7 @@ import { toast } from "@/components/ui/toast";
 import Image from "next/image";
 import { editListing } from "@/lib/actions";
 import type { Prisma } from "@/generated/prisma/client";
-
-export type CategoryWithChildren = Prisma.CategoryGetPayload<{
-  include: {
-    children: true;
-  };
-}>;
+import type { CategoryWithChildren } from "@/lib/data";
 
 export type ListingWithCategory = Prisma.ListingGetPayload<{
   include: {

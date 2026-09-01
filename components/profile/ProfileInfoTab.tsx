@@ -1,24 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { formatDate } from "@/lib/utils";
-import { Prisma } from "@/generated/prisma/client";
-
-type UserWithCounts = Prisma.UserGetPayload<{
-  select: {
-    id: true;
-    name: true;
-    email: true;
-    phone: true;
-    image: true;
-    createdAt: true;
-    _count: {
-      select: {
-        listings: true;
-        favorites: true;
-      };
-    };
-  };
-}>;
+import type { UserWithCounts } from "@/lib/data";
 
 type ProfileInfoTabProps = {
   user: UserWithCounts | null;

@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { getProfilePageData } from "@/lib/data";
 import { redirect } from "next/navigation";
 import ProfileTabs from "@/components/profile/ProfileTabs";
 import ProfileInfoTab from "@/components/profile/ProfileInfoTab";
@@ -24,23 +25,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
   // Get user data from Prisma using email (since BetterAuth ID differs from Prisma ID)
   const user = sessionData?.user
-    ? await prisma.user.findUnique({
-        where: { email: sessionData.user.email },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          phone: true,
-          image: true,
-          createdAt: true,
-          _count: {
-            select: {
-              listings: true,
-              favorites: true,
-            },
-          },
-        },
-      })
+    ? await getProfilePageData(sessionData.user.email)
     : null;
 
   const { tab: activeTab = "info" } = params;
