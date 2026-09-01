@@ -9,16 +9,28 @@ import {
   type EditListingInput,
 } from "@/lib/schemas/listing.schema";
 
-export async function updateProfile(formData: FormData) {
-  const user = await getAuthenticatedUser();
+export async function updateProfile(
+  prevState: { success?: boolean; error?: string } | null,
+  formData: FormData,
+) {
+  try {
+    const user = await getAuthenticatedUser();
 
-  const name = formData.get("name") as string;
-  const phone = formData.get("phone") as string;
+    const name = formData.get("name") as string;
+    const phone = formData.get("phone") as string;
 
-  return await prisma.user.update({
-    where: { email: user.email },
-    data: { name, phone: phone.replaceAll(" ", "") },
-  });
+    await prisma.user.update({
+      where: { email: user.email },
+      data: { name, phone: phone.replaceAll(" ", "") },
+    });
+
+    return { success: true };
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to update profile",
+    };
+  }
 }
 
 export async function deleteListing(listingId: string) {

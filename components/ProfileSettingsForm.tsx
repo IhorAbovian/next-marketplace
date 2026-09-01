@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import PhoneInput from "react-phone-number-input";
-import { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Camera } from "lucide-react";
-
 import { updateProfile } from "@/lib/actions";
+import { useActionState } from "react";
 
 export type ProfileSettingsFormProps = {
   initialName: string | null;
@@ -23,10 +22,29 @@ export default function ProfileSettingsForm({
   initialPhone,
   initialAvatar,
 }: ProfileSettingsFormProps) {
+  const [state, action, isPending] = useActionState(updateProfile, null);
+  const [avatar, setAvatar] = useState(initialAvatar || null);
   const [name, setName] = useState(initialName || "");
   const [phone, setPhone] = useState(initialPhone || "");
-  const [avatar, setAvatar] = useState(initialAvatar || null);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (state?.error) {
+      toast.add({
+        type: "error",
+        title: "Error",
+        description: state.error,
+      });
+    }
+
+    if (state?.success) {
+      toast.add({
+        type: "success",
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+    }
+  }, [state]);
 
   const handleAvatarUpload = useCallback(async (file: File) => {
     setUploading(true);
@@ -62,45 +80,8 @@ export default function ProfileSettingsForm({
     }
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    // Validate phone if provided
-    if (phone && !isValidPhoneNumber(phone)) {
-      toast.add({
-        type: "error",
-        title: "Error",
-        description: "Please enter a valid phone number",
-      });
-      return;
-    }
-
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-    formData.append("phone", phone);
-
-    console.log({ phone2: phone });
-
-    try {
-      await updateProfile(formData);
-
-      toast.add({
-        type: "success",
-        title: "Success",
-        description: "Profile updated successfully",
-      });
-    } catch (error) {
-      toast.add({
-        type: "error",
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to update profile",
-      });
-    }
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form action={action} className="space-y-6">
       <div className="flex justify-center">
         <div className="relative">
           <Avatar className="w-24 h-24">
@@ -143,15 +124,15 @@ export default function ProfileSettingsForm({
         <PhoneInput
           name="phone"
           value={phone}
-          onChange={(value) => {
-            setPhone(value || "");
-          }}
+          onChange={(value) => setPhone(value || "")}
           placeholder="Phone (optional)"
           defaultCountry="CA"
           countries={["CA", "US"]}
         />
       </div>
-      <Button type="submit">Save Changes</Button>
+      <Button type="submit" disabled={isPending}>
+        {isPending ? "Saving..." : "Save Changes"}
+      </Button>
     </form>
   );
 }
