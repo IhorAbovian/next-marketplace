@@ -44,13 +44,21 @@ export default function MessagesClient({
   useEffect(() => {
     if (!selectedChatId) return;
 
+    let timeoutId: ReturnType<typeof setTimeout>;
+    let cancelled = false;
+
     const loadMessages = async () => {
-      setMessages(await getChatMessages(selectedChatId));
+      const data = await getChatMessages(selectedChatId);
+      if (cancelled) return;
+      setMessages(data);
+      timeoutId = setTimeout(loadMessages, 4000);
     };
 
     loadMessages();
-    const interval = setInterval(loadMessages, 4000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, [selectedChatId]);
 
   const handleSend = async (e: React.FormEvent) => {
