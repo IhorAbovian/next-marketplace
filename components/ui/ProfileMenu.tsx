@@ -53,6 +53,12 @@ export default function ProfileMenu({ userName }: ProfileMenuProps) {
                 Favorites
               </Link>
               <Link
+                href="/messages"
+                className="px-4 py-3 hover:bg-gray-100 rounded text-gray-900 block"
+              >
+                My Messages
+              </Link>
+              <Link
                 href="/profile?tab=settings"
                 className="px-4 py-3 hover:bg-gray-100 rounded text-gray-900 block"
               >

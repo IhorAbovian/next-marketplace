@@ -2,6 +2,7 @@ import Link from "next/link";
 import SearchBar from "@/components/ui/SearchBar";
 import ProfileMenu from "@/components/ui/ProfileMenu";
 import { Button } from "@/components/ui/button";
+import { FaEnvelope } from "react-icons/fa";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -57,6 +58,13 @@ export default async function Header() {
           </div>
         ) : (
           <div className="flex items-center gap-4">
+            <Link
+              href="/messages"
+              aria-label="Messages"
+              className="text-gray-700 hover:text-black"
+            >
+              <FaEnvelope size={20} />
+            </Link>
             <Link href="/create-listing">
               <Button>Create Listing</Button>
             </Link>
