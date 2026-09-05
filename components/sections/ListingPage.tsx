@@ -94,7 +94,11 @@ export default function ListingPage({
             </span>
           </div>
           {currentUserId !== listing.authorId && (
-            <ContactSellerButton className="w-full py-3" />
+            <ContactSellerButton
+              listingId={listing.id}
+              sellerId={listing.authorId}
+              className="w-full py-3"
+            />
           )}
 
           <FavoriteButton listingId={listing.id} className="w-full py-3" />

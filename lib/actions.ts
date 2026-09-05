@@ -207,3 +207,71 @@ export async function toggleFavorite(listingId: string) {
     });
   }
 }
+
+export async function getUserChats() {
+  const user = await getAuthenticatedUser();
+
+  const chats = await prisma.chat.findMany({
+    where: { OR: [{ buyerId: user.id }, { sellerId: user.id }] },
+  });
+
+  return Promise.all(
+    chats.map(async (chat) => {
+      const otherUserId =
+        chat.buyerId === user.id ? chat.sellerId : chat.buyerId;
+
+      const [listing, otherUser, lastMessage] = await Promise.all([
+        prisma.listing.findUnique({
+          where: { id: chat.listingId },
+          select: { title: true },
+        }),
+        prisma.user.findUnique({
+          where: { id: otherUserId },
+          select: { name: true, email: true },
+        }),
+        prisma.chatMessage.findFirst({
+          where: { chatId: chat.id },
+          orderBy: { createdAt: "desc" },
+        }),
+      ]);
+
+      return {
+        id: chat.id,
+        title: `${listing?.title ?? "Listing"} - ${otherUser?.name ?? otherUser?.email ?? "User"}`,
+        lastMessage: lastMessage?.content ?? "",
+        isSeller: chat.sellerId === user.id,
+      };
+    }),
+  );
+}
+
+export async function getChatMessages(chatId: string) {
+  await getAuthenticatedUser();
+
+  return prisma.chatMessage.findMany({
+    where: { chatId },
+    orderBy: { createdAt: "asc" },
+  });
+}
+
+export async function sendChatMessage(chatId: string, content: string) {
+  const user = await getAuthenticatedUser();
+
+  return prisma.chatMessage.create({
+    data: { chatId, senderId: user.id, content },
+  });
+}
+
+export async function createOrFindChat(listingId: string, sellerId: string) {
+  const user = await getAuthenticatedUser();
+
+  const existing = await prisma.chat.findFirst({
+    where: { listingId, buyerId: user.id, sellerId },
+  });
+
+  if (existing) return existing;
+
+  return prisma.chat.create({
+    data: { listingId, buyerId: user.id, sellerId },
+  });
+}
