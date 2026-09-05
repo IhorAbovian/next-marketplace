@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import SortDropdown from "@/components/SortDropdown";
 import Pagination from "@/components/Pagination";
-import { getSearchValue, type Listing } from "@/lib/data";
+import { getSearchValue, type ListingWithCategory } from "@/lib/data";
 
 export default async function SearchPage({
   searchParams,
@@ -47,7 +47,7 @@ export default async function SearchPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings.map((listing: Listing) => (
+            {listings.map((listing: ListingWithCategory) => (
               <Link
                 key={listing.id}
                 href={`/listings/${listing.category.parent?.slug || listing.category.slug}/${listing.category.slug}/${listing.id}`}
