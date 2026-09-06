@@ -117,6 +117,7 @@ export default function MessagesClient({
   return (
     <div>
       <ToggleGroup
+        variant="outline"
         aria-label="Filter messages"
         value={[filter]}
         onValueChange={(value) => {

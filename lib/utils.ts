@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { Decimal } from "@prisma/client/runtime/client";
 import dayjs from "dayjs";
+import lodashDebounce from "lodash/debounce";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -25,16 +26,4 @@ export function formatDate(
   return dayjs(date).format(format);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const debounce = (func: (...args: any[]) => any, wait: number) => {
-  let timeoutId: ReturnType<typeof setTimeout> | null;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (...args: any[]) => {
-    if (timeoutId) clearTimeout(timeoutId);
-
-    timeoutId = setTimeout(() => {
-      func(...args);
-    }, wait);
-  };
-};
+export { lodashDebounce as debounce };
