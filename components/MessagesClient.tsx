@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { MessageCircleIcon, SearchIcon, SendIcon } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +14,7 @@ import {
   MessageScrollerViewport,
 } from "@/components/ui/message-scroller";
 import { Textarea } from "@/components/ui/textarea";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn, debounce } from "@/lib/utils";
 import { getChatMessages, sendChatMessage } from "@/lib/actions";
 import type { ChatMessage } from "@/generated/prisma/browser";
@@ -32,38 +32,11 @@ const FILTERS = [
   { value: "replying-to", label: "Replying To" },
 ] as const;
 
-// scoped accent so the messenger feels vibrant without touching the global theme
-const ACCENT_STYLE = {
-  "--primary": "oklch(0.58 0.196 275)",
-  "--primary-foreground": "oklch(0.98 0 0)",
-  "--ring": "oklch(0.58 0.196 275 / 0.5)",
-} as React.CSSProperties;
-
-const AVATAR_PALETTE = [
-  "bg-gradient-to-br from-violet-500 to-indigo-600",
-  "bg-gradient-to-br from-sky-500 to-cyan-600",
-  "bg-gradient-to-br from-emerald-500 to-teal-600",
-  "bg-gradient-to-br from-amber-500 to-orange-600",
-  "bg-gradient-to-br from-rose-500 to-pink-600",
-  "bg-gradient-to-br from-fuchsia-500 to-purple-600",
-];
-
-function getAvatarClass(id: string) {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++)
-    hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
-  return AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
-}
-
 type MessagesClientProps = {
   chats: ChatPreview[];
   initialChatId: string | null;
   currentUserId: string;
 };
-
-function getInitials(title: string) {
-  return title.trim().charAt(0).toUpperCase() || "?";
-}
 
 export default function MessagesClient({
   chats,
@@ -142,33 +115,31 @@ export default function MessagesClient({
   const displayedMessages = selectedChatId ? messages : [];
 
   return (
-    <div style={ACCENT_STYLE}>
-      <fieldset
-        className="inline-flex items-center gap-1 rounded-full bg-muted p-1 mb-6"
+    <div>
+      <ToggleGroup
         aria-label="Filter messages"
+        value={[filter]}
+        onValueChange={(value) => {
+          const next = value[0] as (typeof FILTERS)[number]["value"];
+          if (next) setFilter(next);
+        }}
+        className="rounded-full bg-muted p-1 mb-6"
       >
         {FILTERS.map((f) => (
-          <label
+          <ToggleGroupItem
             key={f.value}
+            value={f.value}
             className={cn(
-              "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
               filter === f.value
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <input
-              type="radio"
-              name="msgFilter"
-              value={f.value}
-              checked={filter === f.value}
-              onChange={() => setFilter(f.value)}
-              className="sr-only"
-            />
             {f.label}
-          </label>
+          </ToggleGroupItem>
         ))}
-      </fieldset>
+      </ToggleGroup>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-0 rounded-2xl border shadow-sm overflow-hidden h-[70vh] min-h-125">
         {/* Left: search + chat list */}
@@ -204,12 +175,6 @@ export default function MessagesClient({
                     selectedChatId === chat.id && "bg-primary/10",
                   )}
                 >
-                  <Avatar className={cn("text-white", getAvatarClass(chat.id))}>
-                    <AvatarFallback className="bg-transparent font-semibold text-white">
-                      {getInitials(chat.title)}
-                    </AvatarFallback>
-                  </Avatar>
-
                   <div className="min-w-0">
                     <p className="font-medium text-sm truncate">{chat.title}</p>
                     <p className="text-xs text-muted-foreground truncate">
@@ -235,14 +200,6 @@ export default function MessagesClient({
           ) : (
             <>
               <div className="p-3 border-b flex items-center gap-3 bg-card">
-                <Avatar
-                  size="sm"
-                  className={cn("text-white", getAvatarClass(selectedChat.id))}
-                >
-                  <AvatarFallback className="bg-transparent font-semibold text-white">
-                    {getInitials(selectedChat.title)}
-                  </AvatarFallback>
-                </Avatar>
                 <p className="font-medium text-sm">{selectedChat.title}</p>
               </div>
 
