@@ -248,6 +248,8 @@ export async function getUserChats() {
 export async function getChatMessages(chatId: string) {
   await getAuthenticatedUser();
 
+  // set chat hasNewMessages to false for the current user
+
   return prisma.chatMessage.findMany({
     where: { chatId },
     orderBy: { createdAt: "asc" },
@@ -256,6 +258,8 @@ export async function getChatMessages(chatId: string) {
 
 export async function sendChatMessage(chatId: string, content: string) {
   const user = await getAuthenticatedUser();
+
+  // set chat hasNewMessages to true for the other user
 
   return prisma.chatMessage.create({
     data: { chatId, senderId: user.id, content },

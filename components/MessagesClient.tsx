@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, debounce } from "@/lib/utils";
 import { getChatMessages, sendChatMessage } from "@/lib/actions";
 import type { ChatMessage } from "@/generated/prisma/browser";
 
@@ -34,6 +34,7 @@ export default function MessagesClient({
   const [filter, setFilter] =
     useState<(typeof FILTERS)[number]["value"]>("all");
   const [search, setSearch] = useState("");
+  const [filteredChats, setFilteredChats] = useState<ChatPreview[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(
     initialChatId,
   );
@@ -49,34 +50,56 @@ export default function MessagesClient({
 
     const loadMessages = async () => {
       const data = await getChatMessages(selectedChatId);
+
       if (cancelled) return;
+
       setMessages(data);
+
       timeoutId = setTimeout(loadMessages, 4000);
     };
 
     loadMessages();
+
     return () => {
       cancelled = true;
       clearTimeout(timeoutId);
     };
   }, [selectedChatId]);
 
+  useEffect(() => {
+    const filteredChats = chats
+      .filter((chat) => {
+        if (filter === "my-ads") return chat.isSeller;
+        if (filter === "replying-to") return !chat.isSeller;
+
+        return true;
+      })
+      .filter((chat) =>
+        chat.title.toLowerCase().includes(search.toLowerCase()),
+      );
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFilteredChats(filteredChats);
+  }, [search, filter, chats]);
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!selectedChatId || !draft.trim()) return;
 
     const message = await sendChatMessage(selectedChatId, draft);
+
     setMessages((prev) => [...prev, message]);
     setDraft("");
   };
 
-  const filteredChats = chats
-    .filter((chat) => chat.title.toLowerCase().includes(search.toLowerCase()))
-    .filter((chat) => {
-      if (filter === "my-ads") return chat.isSeller;
-      if (filter === "replying-to") return !chat.isSeller;
-      return true;
-    });
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("CHANGE", e.target.value);
+
+    setSearch(e.target.value);
+  };
+
+  const debouncedHandleSearchChange = debounce(handleSearchChange, 300);
 
   const selectedChat = chats.find((c) => c.id === selectedChatId);
   const displayedMessages = selectedChatId ? messages : [];
@@ -115,8 +138,7 @@ export default function MessagesClient({
               type="search"
               placeholder="Search chats..."
               aria-label="Search chats"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={debouncedHandleSearchChange}
             />
           </div>
 
@@ -126,6 +148,7 @@ export default function MessagesClient({
                 No chats found
               </li>
             )}
+
             {filteredChats.map((chat) => (
               <li key={chat.id}>
                 <button
@@ -165,8 +188,10 @@ export default function MessagesClient({
                     No messages yet. Say hello!
                   </p>
                 )}
+
                 {displayedMessages.map((message) => {
                   const isOwnMessage = message.senderId === currentUserId;
+
                   return (
                     <div
                       key={message.id}
@@ -200,6 +225,7 @@ export default function MessagesClient({
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                 />
+
                 <Button
                   type="submit"
                   aria-label="Send message"
