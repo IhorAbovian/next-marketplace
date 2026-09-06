@@ -1,8 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MessageCircleIcon, SearchIcon, SendIcon } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  MessageScroller,
+  MessageScrollerButton,
+  MessageScrollerContent,
+  MessageScrollerItem,
+  MessageScrollerProvider,
+  MessageScrollerViewport,
+} from "@/components/ui/message-scroller";
+import { Textarea } from "@/components/ui/textarea";
 import { cn, debounce } from "@/lib/utils";
 import { getChatMessages, sendChatMessage } from "@/lib/actions";
 import type { ChatMessage } from "@/generated/prisma/browser";
@@ -20,11 +32,38 @@ const FILTERS = [
   { value: "replying-to", label: "Replying To" },
 ] as const;
 
+// scoped accent so the messenger feels vibrant without touching the global theme
+const ACCENT_STYLE = {
+  "--primary": "oklch(0.58 0.196 275)",
+  "--primary-foreground": "oklch(0.98 0 0)",
+  "--ring": "oklch(0.58 0.196 275 / 0.5)",
+} as React.CSSProperties;
+
+const AVATAR_PALETTE = [
+  "bg-gradient-to-br from-violet-500 to-indigo-600",
+  "bg-gradient-to-br from-sky-500 to-cyan-600",
+  "bg-gradient-to-br from-emerald-500 to-teal-600",
+  "bg-gradient-to-br from-amber-500 to-orange-600",
+  "bg-gradient-to-br from-rose-500 to-pink-600",
+  "bg-gradient-to-br from-fuchsia-500 to-purple-600",
+];
+
+function getAvatarClass(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++)
+    hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  return AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
+}
+
 type MessagesClientProps = {
   chats: ChatPreview[];
   initialChatId: string | null;
   currentUserId: string;
 };
+
+function getInitials(title: string) {
+  return title.trim().charAt(0).toUpperCase() || "?";
+}
 
 export default function MessagesClient({
   chats,
@@ -94,8 +133,6 @@ export default function MessagesClient({
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("CHANGE", e.target.value);
-
     setSearch(e.target.value);
   };
 
@@ -105,16 +142,19 @@ export default function MessagesClient({
   const displayedMessages = selectedChatId ? messages : [];
 
   return (
-    <>
-      <fieldset className="flex gap-2 mb-6" aria-label="Filter messages">
+    <div style={ACCENT_STYLE}>
+      <fieldset
+        className="inline-flex items-center gap-1 rounded-full bg-muted p-1 mb-6"
+        aria-label="Filter messages"
+      >
         {FILTERS.map((f) => (
           <label
             key={f.value}
             className={cn(
-              "cursor-pointer rounded-lg border px-4 py-2 text-sm transition-colors",
+              "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
               filter === f.value
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-muted-foreground hover:bg-muted",
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             <input
@@ -130,19 +170,23 @@ export default function MessagesClient({
         ))}
       </fieldset>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border rounded-lg overflow-hidden min-h-125">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-0 rounded-2xl border shadow-sm overflow-hidden h-[70vh] min-h-125">
         {/* Left: search + chat list */}
-        <div className="md:col-span-1 border-r flex flex-col">
+        <div className="md:col-span-1 border-r flex flex-col min-h-0 bg-card">
           <div className="p-3 border-b">
-            <Input
-              type="search"
-              placeholder="Search chats..."
-              aria-label="Search chats"
-              onChange={debouncedHandleSearchChange}
-            />
+            <div className="relative">
+              <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search chats..."
+                aria-label="Search chats"
+                onChange={debouncedHandleSearchChange}
+                className="rounded-full border-transparent bg-muted pl-9 focus-visible:bg-background"
+              />
+            </div>
           </div>
 
-          <ul className="flex-1 overflow-y-auto">
+          <ul className="flex-1 overflow-y-auto p-2 space-y-1">
             {filteredChats.length === 0 && (
               <li className="p-4 text-sm text-muted-foreground">
                 No chats found
@@ -156,14 +200,22 @@ export default function MessagesClient({
                   aria-label={`Open chat with ${chat.title}`}
                   onClick={() => setSelectedChatId(chat.id)}
                   className={cn(
-                    "w-full text-left px-4 py-3 border-b hover:bg-muted transition-colors",
-                    selectedChatId === chat.id && "bg-muted",
+                    "w-full flex items-center gap-3 text-left rounded-xl px-3 py-2.5 transition-colors hover:bg-muted",
+                    selectedChatId === chat.id && "bg-primary/10",
                   )}
                 >
-                  <p className="font-medium text-sm">{chat.title}</p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {chat.lastMessage}
-                  </p>
+                  <Avatar className={cn("text-white", getAvatarClass(chat.id))}>
+                    <AvatarFallback className="bg-transparent font-semibold text-white">
+                      {getInitials(chat.title)}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm truncate">{chat.title}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {chat.lastMessage}
+                    </p>
+                  </div>
                 </button>
               </li>
             ))}
@@ -171,73 +223,107 @@ export default function MessagesClient({
         </div>
 
         {/* Right: selected chat dialog */}
-        <div className="md:col-span-2 flex flex-col">
+        <div className="md:col-span-2 flex flex-col min-h-0 bg-muted/30">
           {!selectedChat ? (
-            <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">
-              Select a chat to start messaging
+            <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center px-6">
+              <MessageCircleIcon className="size-10 text-muted-foreground/30" />
+              <p className="text-sm font-medium">Select a conversation</p>
+              <p className="text-sm text-muted-foreground">
+                Choose a chat from the list to view messages
+              </p>
             </div>
           ) : (
             <>
-              <div className="p-3 border-b">
+              <div className="p-3 border-b flex items-center gap-3 bg-card">
+                <Avatar
+                  size="sm"
+                  className={cn("text-white", getAvatarClass(selectedChat.id))}
+                >
+                  <AvatarFallback className="bg-transparent font-semibold text-white">
+                    {getInitials(selectedChat.title)}
+                  </AvatarFallback>
+                </Avatar>
                 <p className="font-medium text-sm">{selectedChat.title}</p>
               </div>
 
-              <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-2">
-                {displayedMessages.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    No messages yet. Say hello!
-                  </p>
-                )}
-
-                {displayedMessages.map((message) => {
-                  const isOwnMessage = message.senderId === currentUserId;
-
-                  return (
-                    <div
-                      key={message.id}
-                      className={cn(
-                        "flex",
-                        isOwnMessage ? "justify-end" : "justify-start",
+              <MessageScrollerProvider>
+                <MessageScroller className="flex-1 min-h-0">
+                  <MessageScrollerViewport>
+                    <MessageScrollerContent className="p-4 gap-3">
+                      {displayedMessages.length === 0 && (
+                        <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+                          <MessageCircleIcon className="size-8 text-muted-foreground/30" />
+                          <p className="text-sm text-muted-foreground">
+                            No messages yet. Say hello!
+                          </p>
+                        </div>
                       )}
-                    >
-                      <div
-                        className={cn(
-                          "rounded-lg px-3 py-2 text-sm max-w-4/5",
-                          !isOwnMessage && "bg-muted",
-                        )}
-                      >
-                        {message.content}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+
+                      {displayedMessages.map((message, index) => {
+                        const isOwnMessage = message.senderId === currentUserId;
+                        const isLast = index === displayedMessages.length - 1;
+
+                        return (
+                          <MessageScrollerItem
+                            key={message.id}
+                            messageId={message.id}
+                            scrollAnchor={isLast}
+                            className={cn(
+                              "flex animate-in fade-in slide-in-from-bottom-2 duration-300",
+                              isOwnMessage ? "justify-end" : "justify-start",
+                            )}
+                          >
+                            <Bubble
+                              align={isOwnMessage ? "end" : "start"}
+                              variant={isOwnMessage ? "default" : "muted"}
+                            >
+                              <BubbleContent
+                                className={cn(
+                                  "shadow-sm",
+                                  isOwnMessage
+                                    ? "rounded-2xl rounded-br-md"
+                                    : "rounded-2xl rounded-bl-md",
+                                )}
+                              >
+                                {message.content}
+                              </BubbleContent>
+                            </Bubble>
+                          </MessageScrollerItem>
+                        );
+                      })}
+                    </MessageScrollerContent>
+                  </MessageScrollerViewport>
+
+                  <MessageScrollerButton direction="end" />
+                </MessageScroller>
+              </MessageScrollerProvider>
 
               <form
                 onSubmit={handleSend}
-                className="p-3 border-t flex flex-col gap-2"
+                className="flex items-end gap-2 border-t bg-card p-3"
               >
-                <textarea
-                  className="w-full border rounded p-2 max-h-40 resize-none overflow-y-auto"
+                <Textarea
+                  className="h-24 field-sizing-fixed resize-none rounded-2xl border-transparent bg-muted shadow-none focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-primary/40"
                   placeholder="Type your message..."
                   aria-label="Message"
-                  rows={3}
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                 />
 
                 <Button
                   type="submit"
+                  size="icon-lg"
                   aria-label="Send message"
-                  className="self-end"
+                  disabled={!draft.trim()}
+                  className="rounded-full shrink-0"
                 >
-                  Send
+                  <SendIcon />
                 </Button>
               </form>
             </>
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
