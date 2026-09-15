@@ -15,9 +15,10 @@ import {
 } from "@/components/ui/message-scroller";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { cn, debounce } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { getChatMessages, sendChatMessage } from "@/lib/actions";
 import type { ChatMessage } from "@/generated/prisma/browser";
+import lodashDebounce from "lodash/debounce";
 
 type ChatPreview = {
   id: string;
@@ -109,7 +110,7 @@ export default function MessagesClient({
     setSearch(e.target.value);
   };
 
-  const debouncedHandleSearchChange = debounce(handleSearchChange, 300);
+  const debouncedHandleSearchChange = lodashDebounce(handleSearchChange, 300);
 
   const selectedChat = chats.find((c) => c.id === selectedChatId);
   const displayedMessages = selectedChatId ? messages : [];
@@ -204,57 +205,55 @@ export default function MessagesClient({
                 <p className="font-medium text-sm">{selectedChat.title}</p>
               </div>
 
-              <MessageScrollerProvider>
-                <MessageScroller className="flex-1 min-h-0">
-                  <MessageScrollerViewport>
-                    <MessageScrollerContent className="p-4 gap-3">
-                      {displayedMessages.length === 0 && (
-                        <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
-                          <MessageCircleIcon className="size-8 text-muted-foreground/30" />
-                          <p className="text-sm text-muted-foreground">
-                            No messages yet. Say hello!
-                          </p>
-                        </div>
-                      )}
+              {displayedMessages.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center gap-2 py-10 text-center">
+                  <MessageCircleIcon className="size-8 text-muted-foreground/30" />
+                  <p className="text-sm text-muted-foreground">
+                    No messages yet. Say hello!
+                  </p>
+                </div>
+              ) : (
+                <MessageScrollerProvider autoScroll>
+                  <MessageScroller className="flex-1 min-h-0">
+                    <MessageScrollerViewport>
+                      <MessageScrollerContent className="p-4 gap-3">
+                        {displayedMessages.map((message) => {
+                          const isOwnMessage = message.senderId === currentUserId;
 
-                      {displayedMessages.map((message, index) => {
-                        const isOwnMessage = message.senderId === currentUserId;
-                        const isLast = index === displayedMessages.length - 1;
-
-                        return (
-                          <MessageScrollerItem
-                            key={message.id}
-                            messageId={message.id}
-                            scrollAnchor={isLast}
-                            className={cn(
-                              "flex animate-in fade-in slide-in-from-bottom-2 duration-300",
-                              isOwnMessage ? "justify-end" : "justify-start",
-                            )}
-                          >
-                            <Bubble
-                              align={isOwnMessage ? "end" : "start"}
-                              variant={isOwnMessage ? "default" : "muted"}
+                          return (
+                            <MessageScrollerItem
+                              key={message.id}
+                              messageId={message.id}
+                              className={cn(
+                                "flex animate-in fade-in slide-in-from-bottom-2 duration-300",
+                                isOwnMessage ? "justify-end" : "justify-start",
+                              )}
                             >
-                              <BubbleContent
-                                className={cn(
-                                  "shadow-sm",
-                                  isOwnMessage
-                                    ? "rounded-2xl rounded-br-md"
-                                    : "rounded-2xl rounded-bl-md",
-                                )}
+                              <Bubble
+                                align={isOwnMessage ? "end" : "start"}
+                                variant={isOwnMessage ? "default" : "muted"}
                               >
-                                {message.content}
-                              </BubbleContent>
-                            </Bubble>
-                          </MessageScrollerItem>
-                        );
-                      })}
-                    </MessageScrollerContent>
-                  </MessageScrollerViewport>
+                                <BubbleContent
+                                  className={cn(
+                                    "shadow-sm",
+                                    isOwnMessage
+                                      ? "rounded-2xl rounded-br-md"
+                                      : "rounded-2xl rounded-bl-md",
+                                  )}
+                                >
+                                  {message.content}
+                                </BubbleContent>
+                              </Bubble>
+                            </MessageScrollerItem>
+                          );
+                        })}
+                      </MessageScrollerContent>
+                    </MessageScrollerViewport>
 
-                  <MessageScrollerButton direction="end" />
-                </MessageScroller>
-              </MessageScrollerProvider>
+                    <MessageScrollerButton direction="end" />
+                  </MessageScroller>
+                </MessageScrollerProvider>
+              )}
 
               <form
                 onSubmit={handleSend}

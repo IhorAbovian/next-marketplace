@@ -2,7 +2,6 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { Decimal } from "@prisma/client/runtime/client";
 import dayjs from "dayjs";
-import lodashDebounce from "lodash/debounce";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -25,5 +24,3 @@ export function formatDate(
 ): string {
   return dayjs(date).format(format);
 }
-
-export { lodashDebounce as debounce };
