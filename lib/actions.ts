@@ -246,9 +246,13 @@ export async function getUserChats() {
 }
 
 export async function getChatMessages(chatId: string) {
-  await getAuthenticatedUser();
+  const user = await getAuthenticatedUser();
 
-  // set chat hasNewMessages to false for the current user
+  // mark any messages from the other participant as read
+  await prisma.chatMessage.updateMany({
+    where: { chatId, senderId: { not: user.id }, isRead: false },
+    data: { isRead: true },
+  });
 
   return prisma.chatMessage.findMany({
     where: { chatId },
@@ -259,10 +263,22 @@ export async function getChatMessages(chatId: string) {
 export async function sendChatMessage(chatId: string, content: string) {
   const user = await getAuthenticatedUser();
 
-  // set chat hasNewMessages to true for the other user
-
   return prisma.chatMessage.create({
     data: { chatId, senderId: user.id, content },
+  });
+}
+
+export async function getUnreadMessageCount() {
+  const user = await getAuthenticatedUser();
+
+  return prisma.chatMessage.count({
+    where: {
+      senderId: { not: user.id },
+      isRead: false,
+      chat: {
+        OR: [{ buyerId: user.id }, { sellerId: user.id }],
+      },
+    },
   });
 }
 
