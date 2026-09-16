@@ -59,7 +59,8 @@ export const ModelName = {
   Buyer: 'Buyer',
   Seller: 'Seller',
   Chat: 'Chat',
-  ChatMessage: 'ChatMessage'
+  ChatMessage: 'ChatMessage',
+  ListingView: 'ListingView'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -98,7 +99,9 @@ export const ListingScalarFieldEnum = {
   categoryId: 'categoryId',
   authorId: 'authorId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  status: 'status',
+  viewCount: 'viewCount'
 } as const
 
 export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeof ListingScalarFieldEnum]
@@ -166,10 +169,21 @@ export const ChatMessageScalarFieldEnum = {
   chatId: 'chatId',
   senderId: 'senderId',
   content: 'content',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  isRead: 'isRead'
 } as const
 
 export type ChatMessageScalarFieldEnum = (typeof ChatMessageScalarFieldEnum)[keyof typeof ChatMessageScalarFieldEnum]
+
+
+export const ListingViewScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  listingId: 'listingId',
+  createdAt: 'createdAt'
+} as const
+
+export type ListingViewScalarFieldEnum = (typeof ListingViewScalarFieldEnum)[keyof typeof ListingViewScalarFieldEnum]
 
 
 export const SortOrder = {

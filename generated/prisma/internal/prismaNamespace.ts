@@ -405,7 +405,8 @@ export const ModelName = {
   Buyer: 'Buyer',
   Seller: 'Seller',
   Chat: 'Chat',
-  ChatMessage: 'ChatMessage'
+  ChatMessage: 'ChatMessage',
+  ListingView: 'ListingView'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -421,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "listing" | "image" | "category" | "favorite" | "buyer" | "seller" | "chat" | "chatMessage"
+    modelProps: "user" | "listing" | "image" | "category" | "favorite" | "buyer" | "seller" | "chat" | "chatMessage" | "listingView"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1091,6 +1092,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ListingView: {
+      payload: Prisma.$ListingViewPayload<ExtArgs>
+      fields: Prisma.ListingViewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ListingViewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ListingViewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload>
+        }
+        findFirst: {
+          args: Prisma.ListingViewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ListingViewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload>
+        }
+        findMany: {
+          args: Prisma.ListingViewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload>[]
+        }
+        create: {
+          args: Prisma.ListingViewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload>
+        }
+        createMany: {
+          args: Prisma.ListingViewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ListingViewCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload>[]
+        }
+        delete: {
+          args: Prisma.ListingViewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload>
+        }
+        update: {
+          args: Prisma.ListingViewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload>
+        }
+        deleteMany: {
+          args: Prisma.ListingViewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ListingViewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ListingViewUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload>[]
+        }
+        upsert: {
+          args: Prisma.ListingViewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ListingViewPayload>
+        }
+        aggregate: {
+          args: Prisma.ListingViewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateListingView>
+        }
+        groupBy: {
+          args: Prisma.ListingViewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ListingViewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ListingViewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ListingViewCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1150,7 +1225,9 @@ export const ListingScalarFieldEnum = {
   categoryId: 'categoryId',
   authorId: 'authorId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  status: 'status',
+  viewCount: 'viewCount'
 } as const
 
 export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeof ListingScalarFieldEnum]
@@ -1218,10 +1295,21 @@ export const ChatMessageScalarFieldEnum = {
   chatId: 'chatId',
   senderId: 'senderId',
   content: 'content',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  isRead: 'isRead'
 } as const
 
 export type ChatMessageScalarFieldEnum = (typeof ChatMessageScalarFieldEnum)[keyof typeof ChatMessageScalarFieldEnum]
+
+
+export const ListingViewScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  listingId: 'listingId',
+  createdAt: 'createdAt'
+} as const
+
+export type ListingViewScalarFieldEnum = (typeof ListingViewScalarFieldEnum)[keyof typeof ListingViewScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1293,6 +1381,27 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ListingStatus'
+ */
+export type EnumListingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ListingStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ListingStatus[]'
+ */
+export type ListEnumListingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ListingStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -1469,6 +1578,7 @@ export type GlobalOmitConfig = {
   seller?: Prisma.SellerOmit
   chat?: Prisma.ChatOmit
   chatMessage?: Prisma.ChatMessageOmit
+  listingView?: Prisma.ListingViewOmit
 }
 
 /* Types for Logging */

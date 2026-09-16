@@ -28,10 +28,12 @@ export type AggregateListing = {
 
 export type ListingAvgAggregateOutputType = {
   price: number | null
+  viewCount: number | null
 }
 
 export type ListingSumAggregateOutputType = {
   price: number | null
+  viewCount: number | null
 }
 
 export type ListingMinAggregateOutputType = {
@@ -43,6 +45,8 @@ export type ListingMinAggregateOutputType = {
   authorId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  status: $Enums.ListingStatus | null
+  viewCount: number | null
 }
 
 export type ListingMaxAggregateOutputType = {
@@ -54,6 +58,8 @@ export type ListingMaxAggregateOutputType = {
   authorId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  status: $Enums.ListingStatus | null
+  viewCount: number | null
 }
 
 export type ListingCountAggregateOutputType = {
@@ -65,16 +71,20 @@ export type ListingCountAggregateOutputType = {
   authorId: number
   createdAt: number
   updatedAt: number
+  status: number
+  viewCount: number
   _all: number
 }
 
 
 export type ListingAvgAggregateInputType = {
   price?: true
+  viewCount?: true
 }
 
 export type ListingSumAggregateInputType = {
   price?: true
+  viewCount?: true
 }
 
 export type ListingMinAggregateInputType = {
@@ -86,6 +96,8 @@ export type ListingMinAggregateInputType = {
   authorId?: true
   createdAt?: true
   updatedAt?: true
+  status?: true
+  viewCount?: true
 }
 
 export type ListingMaxAggregateInputType = {
@@ -97,6 +109,8 @@ export type ListingMaxAggregateInputType = {
   authorId?: true
   createdAt?: true
   updatedAt?: true
+  status?: true
+  viewCount?: true
 }
 
 export type ListingCountAggregateInputType = {
@@ -108,6 +122,8 @@ export type ListingCountAggregateInputType = {
   authorId?: true
   createdAt?: true
   updatedAt?: true
+  status?: true
+  viewCount?: true
   _all?: true
 }
 
@@ -206,6 +222,8 @@ export type ListingGroupByOutputType = {
   authorId: string
   createdAt: Date
   updatedAt: Date
+  status: $Enums.ListingStatus
+  viewCount: number
   _count: ListingCountAggregateOutputType | null
   _avg: ListingAvgAggregateOutputType | null
   _sum: ListingSumAggregateOutputType | null
@@ -240,10 +258,13 @@ export type ListingWhereInput = {
   authorId?: Prisma.StringFilter<"Listing"> | string
   createdAt?: Prisma.DateTimeFilter<"Listing"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Listing"> | Date | string
+  status?: Prisma.EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
+  viewCount?: Prisma.IntFilter<"Listing"> | number
   images?: Prisma.ImageListRelationFilter
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   favorites?: Prisma.FavoriteListRelationFilter
+  views?: Prisma.ListingViewListRelationFilter
 }
 
 export type ListingOrderByWithRelationInput = {
@@ -255,10 +276,13 @@ export type ListingOrderByWithRelationInput = {
   authorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
   images?: Prisma.ImageOrderByRelationAggregateInput
   author?: Prisma.UserOrderByWithRelationInput
   category?: Prisma.CategoryOrderByWithRelationInput
   favorites?: Prisma.FavoriteOrderByRelationAggregateInput
+  views?: Prisma.ListingViewOrderByRelationAggregateInput
 }
 
 export type ListingWhereUniqueInput = Prisma.AtLeast<{
@@ -273,10 +297,13 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   authorId?: Prisma.StringFilter<"Listing"> | string
   createdAt?: Prisma.DateTimeFilter<"Listing"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Listing"> | Date | string
+  status?: Prisma.EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
+  viewCount?: Prisma.IntFilter<"Listing"> | number
   images?: Prisma.ImageListRelationFilter
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   favorites?: Prisma.FavoriteListRelationFilter
+  views?: Prisma.ListingViewListRelationFilter
 }, "id">
 
 export type ListingOrderByWithAggregationInput = {
@@ -288,6 +315,8 @@ export type ListingOrderByWithAggregationInput = {
   authorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
   _count?: Prisma.ListingCountOrderByAggregateInput
   _avg?: Prisma.ListingAvgOrderByAggregateInput
   _max?: Prisma.ListingMaxOrderByAggregateInput
@@ -307,6 +336,8 @@ export type ListingScalarWhereWithAggregatesInput = {
   authorId?: Prisma.StringWithAggregatesFilter<"Listing"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Listing"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Listing"> | Date | string
+  status?: Prisma.EnumListingStatusWithAggregatesFilter<"Listing"> | $Enums.ListingStatus
+  viewCount?: Prisma.IntWithAggregatesFilter<"Listing"> | number
 }
 
 export type ListingCreateInput = {
@@ -316,10 +347,13 @@ export type ListingCreateInput = {
   price: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
   images?: Prisma.ImageCreateNestedManyWithoutListingInput
   author: Prisma.UserCreateNestedOneWithoutListingsInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
   favorites?: Prisma.FavoriteCreateNestedManyWithoutListingInput
+  views?: Prisma.ListingViewCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateInput = {
@@ -331,8 +365,11 @@ export type ListingUncheckedCreateInput = {
   authorId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
   images?: Prisma.ImageUncheckedCreateNestedManyWithoutListingInput
   favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutListingInput
+  views?: Prisma.ListingViewUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingUpdateInput = {
@@ -342,10 +379,13 @@ export type ListingUpdateInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ImageUpdateManyWithoutListingNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
   favorites?: Prisma.FavoriteUpdateManyWithoutListingNestedInput
+  views?: Prisma.ListingViewUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateInput = {
@@ -357,8 +397,11 @@ export type ListingUncheckedUpdateInput = {
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ImageUncheckedUpdateManyWithoutListingNestedInput
   favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutListingNestedInput
+  views?: Prisma.ListingViewUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingCreateManyInput = {
@@ -370,6 +413,8 @@ export type ListingCreateManyInput = {
   authorId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
 }
 
 export type ListingUpdateManyMutationInput = {
@@ -379,6 +424,8 @@ export type ListingUpdateManyMutationInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ListingUncheckedUpdateManyInput = {
@@ -390,6 +437,8 @@ export type ListingUncheckedUpdateManyInput = {
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ListingListRelationFilter = {
@@ -411,10 +460,13 @@ export type ListingCountOrderByAggregateInput = {
   authorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
 }
 
 export type ListingAvgOrderByAggregateInput = {
   price?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
 }
 
 export type ListingMaxOrderByAggregateInput = {
@@ -426,6 +478,8 @@ export type ListingMaxOrderByAggregateInput = {
   authorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
 }
 
 export type ListingMinOrderByAggregateInput = {
@@ -437,10 +491,13 @@ export type ListingMinOrderByAggregateInput = {
   authorId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
 }
 
 export type ListingSumOrderByAggregateInput = {
   price?: Prisma.SortOrder
+  viewCount?: Prisma.SortOrder
 }
 
 export type ListingScalarRelationFilter = {
@@ -496,6 +553,10 @@ export type IntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type EnumListingStatusFieldUpdateOperationsInput = {
+  set?: $Enums.ListingStatus
 }
 
 export type ListingCreateNestedOneWithoutImagesInput = {
@@ -568,6 +629,20 @@ export type ListingUpdateOneRequiredWithoutFavoritesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ListingUpdateToOneWithWhereWithoutFavoritesInput, Prisma.ListingUpdateWithoutFavoritesInput>, Prisma.ListingUncheckedUpdateWithoutFavoritesInput>
 }
 
+export type ListingCreateNestedOneWithoutViewsInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutViewsInput, Prisma.ListingUncheckedCreateWithoutViewsInput>
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutViewsInput
+  connect?: Prisma.ListingWhereUniqueInput
+}
+
+export type ListingUpdateOneRequiredWithoutViewsNestedInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutViewsInput, Prisma.ListingUncheckedCreateWithoutViewsInput>
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutViewsInput
+  upsert?: Prisma.ListingUpsertWithoutViewsInput
+  connect?: Prisma.ListingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ListingUpdateToOneWithWhereWithoutViewsInput, Prisma.ListingUpdateWithoutViewsInput>, Prisma.ListingUncheckedUpdateWithoutViewsInput>
+}
+
 export type ListingCreateWithoutAuthorInput = {
   id?: string
   title: string
@@ -575,9 +650,12 @@ export type ListingCreateWithoutAuthorInput = {
   price: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
   images?: Prisma.ImageCreateNestedManyWithoutListingInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
   favorites?: Prisma.FavoriteCreateNestedManyWithoutListingInput
+  views?: Prisma.ListingViewCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutAuthorInput = {
@@ -588,8 +666,11 @@ export type ListingUncheckedCreateWithoutAuthorInput = {
   categoryId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
   images?: Prisma.ImageUncheckedCreateNestedManyWithoutListingInput
   favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutListingInput
+  views?: Prisma.ListingViewUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutAuthorInput = {
@@ -630,6 +711,8 @@ export type ListingScalarWhereInput = {
   authorId?: Prisma.StringFilter<"Listing"> | string
   createdAt?: Prisma.DateTimeFilter<"Listing"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Listing"> | Date | string
+  status?: Prisma.EnumListingStatusFilter<"Listing"> | $Enums.ListingStatus
+  viewCount?: Prisma.IntFilter<"Listing"> | number
 }
 
 export type ListingCreateWithoutImagesInput = {
@@ -639,9 +722,12 @@ export type ListingCreateWithoutImagesInput = {
   price: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
   author: Prisma.UserCreateNestedOneWithoutListingsInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
   favorites?: Prisma.FavoriteCreateNestedManyWithoutListingInput
+  views?: Prisma.ListingViewCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutImagesInput = {
@@ -653,7 +739,10 @@ export type ListingUncheckedCreateWithoutImagesInput = {
   authorId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
   favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutListingInput
+  views?: Prisma.ListingViewUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutImagesInput = {
@@ -679,9 +768,12 @@ export type ListingUpdateWithoutImagesInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   author?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
   favorites?: Prisma.FavoriteUpdateManyWithoutListingNestedInput
+  views?: Prisma.ListingViewUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutImagesInput = {
@@ -693,7 +785,10 @@ export type ListingUncheckedUpdateWithoutImagesInput = {
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutListingNestedInput
+  views?: Prisma.ListingViewUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingCreateWithoutCategoryInput = {
@@ -703,9 +798,12 @@ export type ListingCreateWithoutCategoryInput = {
   price: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
   images?: Prisma.ImageCreateNestedManyWithoutListingInput
   author: Prisma.UserCreateNestedOneWithoutListingsInput
   favorites?: Prisma.FavoriteCreateNestedManyWithoutListingInput
+  views?: Prisma.ListingViewCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutCategoryInput = {
@@ -716,8 +814,11 @@ export type ListingUncheckedCreateWithoutCategoryInput = {
   authorId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
   images?: Prisma.ImageUncheckedCreateNestedManyWithoutListingInput
   favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutListingInput
+  views?: Prisma.ListingViewUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutCategoryInput = {
@@ -753,9 +854,12 @@ export type ListingCreateWithoutFavoritesInput = {
   price: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
   images?: Prisma.ImageCreateNestedManyWithoutListingInput
   author: Prisma.UserCreateNestedOneWithoutListingsInput
   category: Prisma.CategoryCreateNestedOneWithoutListingsInput
+  views?: Prisma.ListingViewCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutFavoritesInput = {
@@ -767,7 +871,10 @@ export type ListingUncheckedCreateWithoutFavoritesInput = {
   authorId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
   images?: Prisma.ImageUncheckedCreateNestedManyWithoutListingInput
+  views?: Prisma.ListingViewUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutFavoritesInput = {
@@ -793,9 +900,12 @@ export type ListingUpdateWithoutFavoritesInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ImageUpdateManyWithoutListingNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
+  views?: Prisma.ListingViewUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutFavoritesInput = {
@@ -807,7 +917,86 @@ export type ListingUncheckedUpdateWithoutFavoritesInput = {
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ImageUncheckedUpdateManyWithoutListingNestedInput
+  views?: Prisma.ListingViewUncheckedUpdateManyWithoutListingNestedInput
+}
+
+export type ListingCreateWithoutViewsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  price: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
+  images?: Prisma.ImageCreateNestedManyWithoutListingInput
+  author: Prisma.UserCreateNestedOneWithoutListingsInput
+  category: Prisma.CategoryCreateNestedOneWithoutListingsInput
+  favorites?: Prisma.FavoriteCreateNestedManyWithoutListingInput
+}
+
+export type ListingUncheckedCreateWithoutViewsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  price: number
+  categoryId: string
+  authorId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
+  images?: Prisma.ImageUncheckedCreateNestedManyWithoutListingInput
+  favorites?: Prisma.FavoriteUncheckedCreateNestedManyWithoutListingInput
+}
+
+export type ListingCreateOrConnectWithoutViewsInput = {
+  where: Prisma.ListingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ListingCreateWithoutViewsInput, Prisma.ListingUncheckedCreateWithoutViewsInput>
+}
+
+export type ListingUpsertWithoutViewsInput = {
+  update: Prisma.XOR<Prisma.ListingUpdateWithoutViewsInput, Prisma.ListingUncheckedUpdateWithoutViewsInput>
+  create: Prisma.XOR<Prisma.ListingCreateWithoutViewsInput, Prisma.ListingUncheckedCreateWithoutViewsInput>
+  where?: Prisma.ListingWhereInput
+}
+
+export type ListingUpdateToOneWithWhereWithoutViewsInput = {
+  where?: Prisma.ListingWhereInput
+  data: Prisma.XOR<Prisma.ListingUpdateWithoutViewsInput, Prisma.ListingUncheckedUpdateWithoutViewsInput>
+}
+
+export type ListingUpdateWithoutViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  images?: Prisma.ImageUpdateManyWithoutListingNestedInput
+  author?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
+  favorites?: Prisma.FavoriteUpdateManyWithoutListingNestedInput
+}
+
+export type ListingUncheckedUpdateWithoutViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.IntFieldUpdateOperationsInput | number
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  images?: Prisma.ImageUncheckedUpdateManyWithoutListingNestedInput
+  favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingCreateManyAuthorInput = {
@@ -818,6 +1007,8 @@ export type ListingCreateManyAuthorInput = {
   categoryId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
 }
 
 export type ListingUpdateWithoutAuthorInput = {
@@ -827,9 +1018,12 @@ export type ListingUpdateWithoutAuthorInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ImageUpdateManyWithoutListingNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutListingsNestedInput
   favorites?: Prisma.FavoriteUpdateManyWithoutListingNestedInput
+  views?: Prisma.ListingViewUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutAuthorInput = {
@@ -840,8 +1034,11 @@ export type ListingUncheckedUpdateWithoutAuthorInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ImageUncheckedUpdateManyWithoutListingNestedInput
   favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutListingNestedInput
+  views?: Prisma.ListingViewUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateManyWithoutAuthorInput = {
@@ -852,6 +1049,8 @@ export type ListingUncheckedUpdateManyWithoutAuthorInput = {
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type ListingCreateManyCategoryInput = {
@@ -862,6 +1061,8 @@ export type ListingCreateManyCategoryInput = {
   authorId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  status?: $Enums.ListingStatus
+  viewCount?: number
 }
 
 export type ListingUpdateWithoutCategoryInput = {
@@ -871,9 +1072,12 @@ export type ListingUpdateWithoutCategoryInput = {
   price?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ImageUpdateManyWithoutListingNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   favorites?: Prisma.FavoriteUpdateManyWithoutListingNestedInput
+  views?: Prisma.ListingViewUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutCategoryInput = {
@@ -884,8 +1088,11 @@ export type ListingUncheckedUpdateWithoutCategoryInput = {
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   images?: Prisma.ImageUncheckedUpdateManyWithoutListingNestedInput
   favorites?: Prisma.FavoriteUncheckedUpdateManyWithoutListingNestedInput
+  views?: Prisma.ListingViewUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateManyWithoutCategoryInput = {
@@ -896,6 +1103,8 @@ export type ListingUncheckedUpdateManyWithoutCategoryInput = {
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -906,11 +1115,13 @@ export type ListingUncheckedUpdateManyWithoutCategoryInput = {
 export type ListingCountOutputType = {
   images: number
   favorites: number
+  views: number
 }
 
 export type ListingCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | ListingCountOutputTypeCountImagesArgs
   favorites?: boolean | ListingCountOutputTypeCountFavoritesArgs
+  views?: boolean | ListingCountOutputTypeCountViewsArgs
 }
 
 /**
@@ -937,6 +1148,13 @@ export type ListingCountOutputTypeCountFavoritesArgs<ExtArgs extends runtime.Typ
   where?: Prisma.FavoriteWhereInput
 }
 
+/**
+ * ListingCountOutputType without action
+ */
+export type ListingCountOutputTypeCountViewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ListingViewWhereInput
+}
+
 
 export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -947,10 +1165,13 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   authorId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  status?: boolean
+  viewCount?: boolean
   images?: boolean | Prisma.Listing$imagesArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   favorites?: boolean | Prisma.Listing$favoritesArgs<ExtArgs>
+  views?: boolean | Prisma.Listing$viewsArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
 
@@ -963,6 +1184,8 @@ export type ListingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   authorId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  status?: boolean
+  viewCount?: boolean
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
@@ -976,6 +1199,8 @@ export type ListingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   authorId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  status?: boolean
+  viewCount?: boolean
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
@@ -989,14 +1214,17 @@ export type ListingSelectScalar = {
   authorId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  status?: boolean
+  viewCount?: boolean
 }
 
-export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "price" | "categoryId" | "authorId" | "createdAt" | "updatedAt", ExtArgs["result"]["listing"]>
+export type ListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "price" | "categoryId" | "authorId" | "createdAt" | "updatedAt" | "status" | "viewCount", ExtArgs["result"]["listing"]>
 export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   images?: boolean | Prisma.Listing$imagesArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   favorites?: boolean | Prisma.Listing$favoritesArgs<ExtArgs>
+  views?: boolean | Prisma.Listing$viewsArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ListingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1015,6 +1243,7 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     author: Prisma.$UserPayload<ExtArgs>
     category: Prisma.$CategoryPayload<ExtArgs>
     favorites: Prisma.$FavoritePayload<ExtArgs>[]
+    views: Prisma.$ListingViewPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1025,6 +1254,8 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     authorId: string
     createdAt: Date
     updatedAt: Date
+    status: $Enums.ListingStatus
+    viewCount: number
   }, ExtArgs["result"]["listing"]>
   composites: {}
 }
@@ -1423,6 +1654,7 @@ export interface Prisma__ListingClient<T, Null = never, ExtArgs extends runtime.
   author<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   category<T extends Prisma.CategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   favorites<T extends Prisma.Listing$favoritesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$favoritesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FavoritePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  views<T extends Prisma.Listing$viewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$viewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ListingViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1460,6 +1692,8 @@ export interface ListingFieldRefs {
   readonly authorId: Prisma.FieldRef<"Listing", 'String'>
   readonly createdAt: Prisma.FieldRef<"Listing", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Listing", 'DateTime'>
+  readonly status: Prisma.FieldRef<"Listing", 'ListingStatus'>
+  readonly viewCount: Prisma.FieldRef<"Listing", 'Int'>
 }
     
 
@@ -1906,6 +2140,30 @@ export type Listing$favoritesArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.FavoriteScalarFieldEnum | Prisma.FavoriteScalarFieldEnum[]
+}
+
+/**
+ * Listing.views
+ */
+export type Listing$viewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ListingView
+   */
+  select?: Prisma.ListingViewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ListingView
+   */
+  omit?: Prisma.ListingViewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ListingViewInclude<ExtArgs> | null
+  where?: Prisma.ListingViewWhereInput
+  orderBy?: Prisma.ListingViewOrderByWithRelationInput | Prisma.ListingViewOrderByWithRelationInput[]
+  cursor?: Prisma.ListingViewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ListingViewScalarFieldEnum | Prisma.ListingViewScalarFieldEnum[]
 }
 
 /**

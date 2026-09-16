@@ -62,3 +62,8 @@ export type Chat = Prisma.ChatModel
  * 
  */
 export type ChatMessage = Prisma.ChatMessageModel
+/**
+ * Model ListingView
+ * 
+ */
+export type ListingView = Prisma.ListingViewModel
