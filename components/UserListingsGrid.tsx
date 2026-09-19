@@ -37,13 +37,29 @@ export default function UserListingsGrid({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "ACTIVE":
-        return <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Active</span>;
+        return (
+          <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+            Active
+          </span>
+        );
       case "HIDDEN":
-        return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs font-medium">Hidden</span>;
+        return (
+          <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs font-medium">
+            Hidden
+          </span>
+        );
       case "SOLD":
-        return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">Sold</span>;
+        return (
+          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+            Sold
+          </span>
+        );
       default:
-        return <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Active</span>;
+        return (
+          <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+            Active
+          </span>
+        );
     }
   };
 
@@ -96,7 +112,9 @@ export default function UserListingsGrid({
                   <h3 className="font-bold text-lg line-clamp-2">
                     {listing.title}
                   </h3>
-                  {showStatus && listing.status && getStatusBadge(listing.status)}
+                  {showStatus &&
+                    listing.status &&
+                    getStatusBadge(listing.status)}
                 </div>
                 <p className="mb-2">${listing.price}</p>
                 <p className="text-sm text-gray-600 mb-4">
@@ -121,7 +139,9 @@ export default function UserListingsGrid({
                     <Button
                       variant="outline"
                       className="w-full justify-center"
-                      onClick={() => handleToggleStatus(listing.id, listing.status)}
+                      onClick={() =>
+                        handleToggleStatus(listing.id, listing.status)
+                      }
                       disabled={isPending}
                     >
                       {listing.status === "ACTIVE" ? (

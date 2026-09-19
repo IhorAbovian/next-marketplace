@@ -60,7 +60,11 @@ export default function DeleteListingButton({
     <div className="flex-1">
       <AlertDialog>
         <AlertDialogTrigger>
-          <Button variant="destructive" disabled={isDeleting} className="w-full">
+          <Button
+            variant="destructive"
+            disabled={isDeleting}
+            className="w-full"
+          >
             {isDeleting ? "Deleting..." : "Delete"}
           </Button>
         </AlertDialogTrigger>
@@ -72,7 +76,8 @@ export default function DeleteListingButton({
             </AlertDialogMedia>
             <AlertDialogTitle>Delete listing?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete listing.
+              This action cannot be undone. This will permanently delete
+              listing.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
