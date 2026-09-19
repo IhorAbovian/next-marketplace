@@ -1,19 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
 import UserListingsGrid from "@/components/UserListingsGrid";
-import { getUserListings } from "@/lib/data";
+import { getUserListingsWithStatus } from "@/lib/data";
 
 export default async function ProfileListingsTab({
   userId,
 }: {
   userId: string;
 }) {
-  const listings = await getUserListings(userId);
+  const listings = await getUserListingsWithStatus(userId);
 
   return (
     <Card>
       <CardContent className="p-8">
         <h2 className="text-2xl font-bold mb-6">My Listings</h2>
-        <UserListingsGrid listings={listings} />
+        <UserListingsGrid listings={listings} showStatus={true} />
       </CardContent>
     </Card>
   );

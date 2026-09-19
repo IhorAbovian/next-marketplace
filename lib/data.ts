@@ -19,6 +19,10 @@ export type ListingWithCategory = Prisma.ListingGetPayload<{
   };
 }>;
 
+export type ListingWithCategoryAndStatus = ListingWithCategory & {
+  status: "ACTIVE" | "HIDDEN" | "SOLD";
+};
+
 export async function getHomePageData(): Promise<{
   categories: CategoryWithChildren[];
   autosListings: ListingWithCategory[];
@@ -33,6 +37,7 @@ export async function getHomePageData(): Promise<{
     }),
     prisma.listing.findMany({
       where: {
+        status: "ACTIVE",
         OR: [
           { category: { slug: "autos" } },
           { category: { parent: { slug: "autos" } } },
@@ -48,6 +53,7 @@ export async function getHomePageData(): Promise<{
     }),
     prisma.listing.findMany({
       where: {
+        status: "ACTIVE",
         OR: [
           { category: { slug: "real-estate" } },
           { category: { parent: { slug: "real-estate" } } },
@@ -119,6 +125,20 @@ export async function getUserListings(
   });
 }
 
+export async function getUserListingsWithStatus(
+  userId: string,
+): Promise<ListingWithCategoryAndStatus[]> {
+  return await prisma.listing.findMany({
+    where: { authorId: userId },
+    orderBy: { createdAt: "desc" },
+    include: {
+      images: { take: 1 },
+      category: { include: { parent: true } },
+      author: true,
+    },
+  });
+}
+
 export async function getUserFavorites(
   userId: string,
 ): Promise<ListingWithCategory[]> {
@@ -172,7 +192,7 @@ export async function getSearchValue(
 
   const [listings, total] = await Promise.all([
     prisma.listing.findMany({
-      where,
+      where: { ...where, status: "ACTIVE" },
       orderBy,
       skip,
       take: 20,
@@ -182,7 +202,7 @@ export async function getSearchValue(
         author: true,
       },
     }),
-    prisma.listing.count({ where }),
+    prisma.listing.count({ where: { ...where, status: "ACTIVE" } }),
   ]);
 
   return {
@@ -195,7 +215,7 @@ export async function getCategoryListings(
   categorySlug: string,
 ): Promise<ListingWithCategory[]> {
   return await prisma.listing.findMany({
-    where: { category: { slug: categorySlug } },
+    where: { category: { slug: categorySlug }, status: "ACTIVE" },
     orderBy: { createdAt: "desc" },
     include: {
       images: { take: 1 },
@@ -208,11 +228,15 @@ export async function getCategoryListings(
 export async function getListingById(
   id: string,
   subcategory: string,
+  currentUserId?: string | null,
 ): Promise<ListingWithCategory | null> {
   return await prisma.listing.findFirst({
     where: {
       id,
       category: { slug: subcategory },
+      ...(currentUserId
+        ? { OR: [{ status: "ACTIVE" }, { authorId: currentUserId }] }
+        : { status: "ACTIVE" }),
     },
     include: {
       images: true,

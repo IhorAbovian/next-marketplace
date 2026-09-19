@@ -153,6 +153,29 @@ export async function editListing(
   }
 }
 
+export async function toggleListingStatus(
+  listingId: string,
+  status: "ACTIVE" | "HIDDEN" | "SOLD",
+) {
+  const user = await getAuthenticatedUser();
+
+  const listing = await prisma.listing.findUnique({
+    where: { id: listingId },
+    select: { authorId: true },
+  });
+
+  if (!listing || listing.authorId !== user.id) {
+    return { error: "Not authorized" };
+  }
+
+  await prisma.listing.update({
+    where: { id: listingId },
+    data: { status },
+  });
+
+  return { success: true };
+}
+
 export async function isFavoritedByUser(listingId: string): Promise<boolean> {
   const session = await getSession();
 

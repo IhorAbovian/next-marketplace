@@ -17,7 +17,7 @@ export default async function ListingRoutePage({
     const user = await getAuthenticatedUser();
     const currentUserId = user?.id || null;
 
-    const listing = await getListingById(third, second);
+    const listing = await getListingById(third, second, currentUserId);
 
     if (!listing) return <div>Not found</div>;
 
@@ -43,7 +43,7 @@ export default async function ListingRoutePage({
     const user = await getAuthenticatedUser();
     const currentUserId = user?.id || null;
 
-    const listing = await getListingById(second, categorySlug);
+    const listing = await getListingById(second, categorySlug, currentUserId);
 
     if (!listing) return <div>Not found</div>;
 
